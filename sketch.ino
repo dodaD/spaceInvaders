@@ -13,6 +13,7 @@ Bullet spaceBullet(35, 0);
 Kubik allMonstriks[NumberOfMonsters];
 
 void setup() {
+  Serial.begin(9600);
   // put your setup code here, to run once:
   pinMode(5,   OUTPUT);
   digitalWrite(5, HIGH);//Disable  SD 
@@ -36,51 +37,65 @@ void setup() {
   ER5517.Active_Window_XY(0,0);
   ER5517.Active_Window_WH(LCD_XSIZE_TFT,LCD_YSIZE_TFT); 
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
-  Serial.begin(9600);
-  createMonsters();
+  
+  createMonsters(1); //number of rows in argument
 }
 
 void loop() {
+  drawKubiks(White);
+  drawBullet(Black); //erase old one
   spaceBullet.move();
-  drawFigures(White);
-  bool haveCrushed = checkCollision(allMonstriks[0]);
-  if(haveCrushed) {
-    drawFigures(Black);
-    spaceBullet.stopMove = true;
-    spaceBullet.returnBack(35, 0);
-    for (int horz=0; horz<sideOfKubik; horz++) {
-      for (int ver=0; ver<sideOfKubik; ver++) {
-        ER5517.DrawPixel(adjustCoordX(allMonstriks[0].allCoords[horz][ver][xCord]), adjustCoordY(allMonstriks[0].allCoords[horz][ver][yCord]), Black);
+  drawBullet(White); //draw new one
+
+  for (int i=0; i<NumberOfMonsters; i++) {
+    bool haveCrushed = checkCollision(allMonstriks[i]);
+    if(haveCrushed) {
+      drawBullet(Black);
+      spaceBullet.returnBack(35, 0);
+      drawBullet(White);
+      spaceBullet.stopMove = true;
+      for (int horz=0; horz<sideOfKubik; horz++) {
+        for (int ver=0; ver<sideOfKubik; ver++) {
+          ER5517.DrawPixel(adjustCoordX(allMonstriks[i].allCoords[horz][ver][xCord]), adjustCoordY(allMonstriks[0].allCoords[horz][ver][yCord]), Black);
+        }
       }
-    }
-    allMonstriks[0].deleteMonstrik();
-  } 
-  drawFigures(Black);
-  /*Serial.print("Y: ");
-  Serial.println(spaceBullet.allCoords[0][0][1]);
-  Serial.print("X: ");
-  Serial.println(spaceBullet.allCoords[0][0][0]);
-  Serial.println(haveCrushed ? "crushed" : "not crushed");
-  Serial.println("******");
-  delay(1000);*/
+      drawKubik(allMonstriks[i], Black);
+      allMonstriks[i].deleteMonstrik();
+      return;
+    } 
+  }
+  
   // put your main code here, to run repeatedly:
 }
 
-void createMonsters() {
-  for(int i=0; i<NumberOfMonsters; i++) {
-    allMonstriks[i] = Kubik (firstKubikX+sideOfKubik*i, firstKubikY+sideOfKubik*i);
+void createMonsters(int rows) {
+  int gap = 0;
+  int rowGap = 0;
+
+  for(int n=0; n<rows; n++) {
+    gap = 0;
+    for(int i=0; i<NumberOfMonsters/rows; i++) {
+      allMonstriks[i+n] = Kubik (firstKubikX+gap+sideOfKubik*i, firstKubikY+sideOfKubik*n+rowGap);
+      gap += 1;
+    }
+    rowGap += 2;
   }
 }
 
-void drawFigures(int colour) {
+void drawKubiks(int colour) {
+  for (int i=0; i<NumberOfMonsters; i++) {
+    drawKubik(allMonstriks[i], colour);
+  }
+}
+
+void drawBullet(int colour) {
+  if(spaceBullet.stopMove) {
+    return;
+  } 
   for (int w=0; w<widthOfBullet; w++) {
     for (int h=0; h<heightOfBullet; h++) {
       ER5517.DrawPixel(adjustCoordX(spaceBullet.allCoords[w][h][xCord]), adjustCoordY(spaceBullet.allCoords[w][h][yCord]), colour);
     }
-  }
-
-  for (int i=0; i<NumberOfMonsters; i++) {
-    drawKubik(allMonstriks[i], colour);
   }
 }
 
