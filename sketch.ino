@@ -1,7 +1,7 @@
 //TODO: зробити штуку яка буде перетворювати координати сітки під координати екрану
 #define screenHeight 800
 #define screenWidth 400
-#define NumberOfMonsters 1
+#define NumberOfMonsters 2
 #define firstKubikX 35
 #define firstKubikY 70
 #include "BulletClass.h"
