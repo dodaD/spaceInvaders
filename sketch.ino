@@ -8,9 +8,11 @@
 #include "MonsterClass.h"
 #include "Constants.h"
 #include "TFTMC050_3.h"
+#include "Display.h"
 
 Bullet spaceBullet(35, 0);
 Kubik allMonstriks[NumberOfMonsters];
+Display display;
 
 void setup() {
   Serial.begin(9600);
@@ -54,11 +56,6 @@ void loop() {
       spaceBullet.returnBack(35, 0);
       drawBullet(White);
       spaceBullet.stopMove = true;
-      for (int horz=0; horz<sideOfKubik; horz++) {
-        for (int ver=0; ver<sideOfKubik; ver++) {
-          ER5517.DrawPixel(adjustCoordX(allMonstriks[i].allCoords[horz][ver][xCord]), adjustCoordY(allMonstriks[0].allCoords[horz][ver][yCord]), Black);
-        }
-      }
       drawKubik(allMonstriks[i], Black);
       allMonstriks[i].deleteMonstrik();
       return;
@@ -94,7 +91,7 @@ void drawBullet(int colour) {
   } 
   for (int w=0; w<widthOfBullet; w++) {
     for (int h=0; h<heightOfBullet; h++) {
-      ER5517.DrawPixel(adjustCoordX(spaceBullet.allCoords[w][h][xCord]), adjustCoordY(spaceBullet.allCoords[w][h][yCord]), colour);
+      display.drawPixel(adjustCoordX(spaceBullet.allCoords[w][h][xCord]), adjustCoordY(spaceBullet.allCoords[w][h][yCord]), colour);
     }
   }
 }
@@ -105,7 +102,7 @@ void drawKubik(Kubik instance, int colour) {
   }
   for (int horz=0; horz<sideOfKubik; horz++) {
     for (int ver=0; ver<sideOfKubik; ver++) {
-      ER5517.DrawPixel(adjustCoordX(instance.allCoords[horz][ver][xCord]), adjustCoordY(instance.allCoords[horz][ver][yCord]), colour);
+     display.drawPixel(adjustCoordX(instance.allCoords[horz][ver][xCord]), adjustCoordY(instance.allCoords[horz][ver][yCord]), colour);
     }
   }
 }

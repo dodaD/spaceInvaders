@@ -6,5 +6,7 @@
 #define heightOfBullet 4 // TODO rename to something that makes sense 
 #define widthOfBullet 1
 #define sideOfKubik 5
+#define gridYLimit 100
+#define gridXLimit 70
 
 #endif
