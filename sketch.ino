@@ -1,7 +1,7 @@
 //TODO: зробити штуку яка буде перетворювати координати сітки під координати екрану
 #define screenHeight 800
 #define screenWidth 400
-#define NumberOfMonsters 2
+#define NumberOfMonsters 1
 #define firstKubikX 35
 #define firstKubikY 70
 #include "BulletClass.h"
@@ -43,6 +43,11 @@ void setup() {
   createMonsters(1); //number of rows in argument
 }
 
+void moveSpaceBullet() {
+  Serial.println("Ok");
+  spaceBullet.move();
+}
+
 void loop() {
   drawKubiks(White);
   drawBullet(Black); //erase old one
@@ -50,6 +55,8 @@ void loop() {
   drawBullet(White); //draw new one
 
   for (int i=0; i<NumberOfMonsters; i++) {
+    drawKubiks(Black);
+    allMonstriks[i].move();
     bool haveCrushed = checkCollision(allMonstriks[i]);
     if(haveCrushed) {
       drawBullet(Black);
@@ -58,10 +65,9 @@ void loop() {
       spaceBullet.stopMove = true;
       drawKubik(allMonstriks[i], Black);
       allMonstriks[i].deleteMonstrik();
-      return;
     } 
   }
-  
+
   // put your main code here, to run repeatedly:
 }
 
@@ -109,7 +115,7 @@ void drawKubik(Kubik instance, int colour) {
 
 bool checkCollision(Kubik instance) {
   if(spaceBullet.stopMove || instance.isDeleted) {
-    return;
+    return false;
   }
   for (int horz=0; horz<sideOfKubik; horz++) {
     for (int ver=0; ver<sideOfKubik; ver++) {

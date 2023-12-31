@@ -8,5 +8,6 @@
 #define sideOfKubik 5
 #define gridYLimit 100
 #define gridXLimit 70
+#define moveDistance 1
 
 #endif
