@@ -9,5 +9,8 @@
 #define gridYLimit 100
 #define gridXLimit 70
 #define moveDistance 1
+#define interval 450UL
+#define NumberOfMonsters 2
+#define NumberOfBullets NumberOfMonsters+1
 
 #endif

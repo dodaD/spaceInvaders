@@ -1,7 +1,6 @@
 //TODO: зробити штуку яка буде перетворювати координати сітки під координати екрану
 #define screenHeight 800
 #define screenWidth 400
-#define NumberOfMonsters 1
 #define firstKubikX 35
 #define firstKubikY 70
 #include "BulletClass.h"
@@ -9,12 +8,13 @@
 #include "Constants.h"
 #include "TFTMC050_3.h"
 #include "Display.h"
+#include "arraysToGraph.h"
 
-Bullet spaceBullet(35, 0);
 Kubik allMonstriks[NumberOfMonsters];
 Display display;
 
 void setup() {
+  allBullets[NumberOfBullets-1] = Bullet(35, 0, true);
   Serial.begin(9600);
   // put your setup code here, to run once:
   pinMode(5,   OUTPUT);
@@ -43,32 +43,38 @@ void setup() {
   createMonsters(1); //number of rows in argument
 }
 
-void moveSpaceBullet() {
-  Serial.println("Ok");
-  spaceBullet.move();
-}
-
 void loop() {
   drawKubiks(White);
-  drawBullet(Black); //erase old one
-  spaceBullet.move();
-  drawBullet(White); //draw new one
+  drawBullets(Black); //erase old one
+  bulletsMove();
+  drawBullets(White); //draw new one
 
   for (int i=0; i<NumberOfMonsters; i++) {
     drawKubiks(Black);
     allMonstriks[i].move();
     bool haveCrushed = checkCollision(allMonstriks[i]);
     if(haveCrushed) {
-      drawBullet(Black);
-      spaceBullet.returnBack(35, 0);
-      drawBullet(White);
-      spaceBullet.stopMove = true;
+      drawBullet(allBullets[NumberOfBullets-1], Black);
+      allBullets[NumberOfBullets-1].returnBack(35, 0);
+       drawBullet(allBullets[NumberOfBullets-1], White);
+      allBullets[NumberOfBullets-1].stopMove = true;
       drawKubik(allMonstriks[i], Black);
       allMonstriks[i].deleteMonstrik();
     } 
   }
 
   // put your main code here, to run repeatedly:
+}
+
+void bulletsMove() {
+  for (int i=0; i<NumberOfBullets-1; i++) {
+    allBullets[i].move();
+    if(allBullets[i].haveReturned) {
+      allBullets[i].returnBack(allMonstriks[i].allCoords[sideOfKubik/2][sideOfKubik-1][xCord], allMonstriks[i].allCoords[sideOfKubik/2][sideOfKubik-1][yCord]);
+      allBullets[i].haveReturned = false;
+    }
+  }
+  allBullets[NumberOfBullets-1].move();
 }
 
 void createMonsters(int rows) {
@@ -78,7 +84,7 @@ void createMonsters(int rows) {
   for(int n=0; n<rows; n++) {
     gap = 0;
     for(int i=0; i<NumberOfMonsters/rows; i++) {
-      allMonstriks[i+n] = Kubik (firstKubikX+gap+sideOfKubik*i, firstKubikY+sideOfKubik*n+rowGap);
+      allMonstriks[i+n] = Kubik (firstKubikX+gap+sideOfKubik*i, firstKubikY+sideOfKubik*n+rowGap, n+i);
       gap += 1;
     }
     rowGap += 2;
@@ -88,17 +94,6 @@ void createMonsters(int rows) {
 void drawKubiks(int colour) {
   for (int i=0; i<NumberOfMonsters; i++) {
     drawKubik(allMonstriks[i], colour);
-  }
-}
-
-void drawBullet(int colour) {
-  if(spaceBullet.stopMove) {
-    return;
-  } 
-  for (int w=0; w<widthOfBullet; w++) {
-    for (int h=0; h<heightOfBullet; h++) {
-      display.drawPixel(adjustCoordX(spaceBullet.allCoords[w][h][xCord]), adjustCoordY(spaceBullet.allCoords[w][h][yCord]), colour);
-    }
   }
 }
 
@@ -113,16 +108,30 @@ void drawKubik(Kubik instance, int colour) {
   }
 }
 
+void drawBullets(int colour) {
+  for (int i=0; i<NumberOfBullets; i++) {
+    drawBullet(allBullets[i], colour);
+  }
+}
+
+void drawBullet(Bullet instance,int colour) {
+  for (int w=0; w<widthOfBullet; w++) {
+    for (int h=0; h<heightOfBullet; h++) {
+      display.drawPixel(adjustCoordX(instance.allCoords[w][h][xCord]), adjustCoordY(instance.allCoords[w][h][yCord]), colour);
+    }
+  }
+}
+
 bool checkCollision(Kubik instance) {
-  if(spaceBullet.stopMove || instance.isDeleted) {
+  if(allBullets[NumberOfBullets].stopMove || instance.isDeleted) {
     return false;
   }
   for (int horz=0; horz<sideOfKubik; horz++) {
     for (int ver=0; ver<sideOfKubik; ver++) {
       for (int w=0; w<widthOfBullet; w++) {
         for (int h=0; h<heightOfBullet; h++) {
-          bool haveSameX = instance.allCoords[horz][ver][xCord] == spaceBullet.allCoords[w][h][xCord];
-          bool haveSameY = instance.allCoords[horz][ver][yCord] == spaceBullet.allCoords[w][h][yCord];
+          bool haveSameX = instance.allCoords[horz][ver][xCord] == allBullets[NumberOfBullets].allCoords[w][h][xCord];
+          bool haveSameY = instance.allCoords[horz][ver][yCord] == allBullets[NumberOfBullets].allCoords[w][h][yCord];
           if(haveSameY == true && haveSameX == true) {
             return true;
           }
