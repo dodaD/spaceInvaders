@@ -1,7 +1,6 @@
 #ifndef Display_h
 #define Display_h
 
-#include "Constants.h"
 #include <Arduino.h>
 
 class Display {

@@ -18,6 +18,7 @@ class Bullet {
     void returnBack(int x, int y);
     bool movingUp;
     bool haveReturned;
+    bool isDeleted;
   private:
     int coordOfTheTopLeftCorner[2];
 };

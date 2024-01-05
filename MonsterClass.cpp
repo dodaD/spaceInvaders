@@ -12,7 +12,6 @@ Kubik::Kubik(int x, int y, int n) {
   }
   isDeleted = false;
   previousMillis = 0UL;
-  goingWest = true;
   numberOfKubik = n;
   allBullets[numberOfKubik] = Bullet(x, y, false);
   coordOfTheTopLeftCorner[xCord] = x+sideOfKubik;
@@ -20,22 +19,17 @@ Kubik::Kubik(int x, int y, int n) {
 }
 
 void Kubik::deleteMonstrik() {
+  allBullets[numberOfKubik].isDeleted = true;
   this->isDeleted = true;
 }
 
-void Kubik::move() {
+void Kubik::move(bool goingWest) {
   if(isDeleted) {
     return;
   }
   unsigned long currentMillis = millis();
 
   if(currentMillis - previousMillis > interval) {
-    if(allCoords[0][0][0] <= moveDistance*numberOfKubik+sideOfKubik*numberOfKubik) {
-      goingWest = false;
-    }else if(allCoords[sideOfKubik-1][sideOfKubik-1][0] >= 70) {
-      goingWest = true;
-    }
-  
     for (int horz=0; horz<sideOfKubik; horz++) {
       for (int ver=0; ver<sideOfKubik; ver++) {
         if (goingWest) {

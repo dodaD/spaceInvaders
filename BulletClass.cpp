@@ -8,10 +8,11 @@ Bullet::Bullet(int x, int y, bool IsMovingUp) {
   coordOfTheTopLeftCorner[xCord] = x;
   coordOfTheTopLeftCorner[yCord] = y;
   movingUp = IsMovingUp;
+  isDeleted = false;
 };
 
 void Bullet::move() {
-  if(stopMove) {
+  if(stopMove || isDeleted) {
     return;
   }
 

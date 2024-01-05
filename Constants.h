@@ -10,7 +10,11 @@
 #define gridXLimit 70
 #define moveDistance 1
 #define interval 450UL
-#define NumberOfMonsters 2
+#define rows 1
+#define columns 2
+#define shipWidth 6
+#define shipHeight 3
+#define NumberOfMonsters rows*columns
 #define NumberOfBullets NumberOfMonsters+1
 
 #endif

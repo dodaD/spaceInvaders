@@ -12,6 +12,7 @@
 
 Kubik allMonstriks[NumberOfMonsters];
 Display display;
+bool monstrikiMoveWay = true; //TODO rename 
 
 void setup() {
   allBullets[NumberOfBullets-1] = Bullet(35, 0, true);
@@ -40,7 +41,7 @@ void setup() {
   ER5517.Active_Window_WH(LCD_XSIZE_TFT,LCD_YSIZE_TFT); 
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   
-  createMonsters(1); //number of rows in argument
+  createMonsters(); //number of rows in argument
 }
 
 void loop() {
@@ -48,17 +49,24 @@ void loop() {
   drawBullets(Black); //erase old one
   bulletsMove();
   drawBullets(White); //draw new one
+  
+  if(allMonstriks[0].allCoords[0][0][xCord] <= 0+moveDistance) {
+    monstrikiMoveWay = false;
+  }else if(allMonstriks[NumberOfMonsters-1].allCoords[sideOfKubik-1][sideOfKubik-1][xCord] >= 70-moveDistance) {
+    monstrikiMoveWay = true;
+  } //TODO: bug - when last or frisrt kibik is deleted the checking is wrong
 
   for (int i=0; i<NumberOfMonsters; i++) {
     drawKubiks(Black);
-    allMonstriks[i].move();
+    allMonstriks[i].move(monstrikiMoveWay);
     bool haveCrushed = checkCollision(allMonstriks[i]);
     if(haveCrushed) {
       drawBullet(allBullets[NumberOfBullets-1], Black);
       allBullets[NumberOfBullets-1].returnBack(35, 0);
-       drawBullet(allBullets[NumberOfBullets-1], White);
+      drawBullet(allBullets[NumberOfBullets-1], White);
       allBullets[NumberOfBullets-1].stopMove = true;
       drawKubik(allMonstriks[i], Black);
+      drawBullet(allBullets[i], Black);
       allMonstriks[i].deleteMonstrik();
     } 
   }
@@ -77,7 +85,7 @@ void bulletsMove() {
   allBullets[NumberOfBullets-1].move();
 }
 
-void createMonsters(int rows) {
+void createMonsters() {
   int gap = 0;
   int rowGap = 0;
 
@@ -115,6 +123,9 @@ void drawBullets(int colour) {
 }
 
 void drawBullet(Bullet instance,int colour) {
+  if(instance.isDeleted) {
+    return;
+  }
   for (int w=0; w<widthOfBullet; w++) {
     for (int h=0; h<heightOfBullet; h++) {
       display.drawPixel(adjustCoordX(instance.allCoords[w][h][xCord]), adjustCoordY(instance.allCoords[w][h][yCord]), colour);
@@ -123,15 +134,15 @@ void drawBullet(Bullet instance,int colour) {
 }
 
 bool checkCollision(Kubik instance) {
-  if(allBullets[NumberOfBullets].stopMove || instance.isDeleted) {
+  if(allBullets[NumberOfBullets-1].stopMove || instance.isDeleted) {
     return false;
   }
   for (int horz=0; horz<sideOfKubik; horz++) {
     for (int ver=0; ver<sideOfKubik; ver++) {
       for (int w=0; w<widthOfBullet; w++) {
         for (int h=0; h<heightOfBullet; h++) {
-          bool haveSameX = instance.allCoords[horz][ver][xCord] == allBullets[NumberOfBullets].allCoords[w][h][xCord];
-          bool haveSameY = instance.allCoords[horz][ver][yCord] == allBullets[NumberOfBullets].allCoords[w][h][yCord];
+          bool haveSameX = instance.allCoords[horz][ver][xCord] == allBullets[NumberOfBullets-1].allCoords[w][h][xCord];
+          bool haveSameY = instance.allCoords[horz][ver][yCord] == allBullets[NumberOfBullets-1].allCoords[w][h][yCord];
           if(haveSameY == true && haveSameX == true) {
             return true;
           }

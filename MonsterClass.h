@@ -13,9 +13,8 @@ class Kubik {
     Kubik(int x, int y, int n);
     int allCoords[ sideOfKubik ][ sideOfKubik ][2];
     void deleteMonstrik();
-    void move();
+    void move(bool goingWest);
     bool isDeleted;
-    bool goingWest;
     unsigned long previousMillis;
   private:
     int coordOfTheTopLeftCorner[2];
