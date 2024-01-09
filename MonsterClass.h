@@ -2,6 +2,7 @@
 #define MonsterClass_h
 
 #include "Constants.h"
+#include "BulletClass.h"
 #include <Arduino.h>
 
 class Kubik {
@@ -10,13 +11,13 @@ class Kubik {
         // Default constructor body
         // You can initialize member variables if necessary
     }
-    Kubik(int x, int y, int n);
+    Kubik(int x, int y);
     int allCoords[ sideOfKubik ][ sideOfKubik ][2];
     void deleteMonstrik();
     void move(bool goingWest);
     bool isDeleted;
     unsigned long previousMillis;
-  private:
+    Bullet* pointerToALlBullets;
     int coordOfTheTopLeftCorner[2];
     int numberOfKubik;
 };

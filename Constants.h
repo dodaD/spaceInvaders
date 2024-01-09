@@ -14,7 +14,11 @@
 #define columns 2
 #define shipWidth 6
 #define shipHeight 3
-#define NumberOfMonsters rows*columns
-#define NumberOfBullets NumberOfMonsters+1
+#define numberOfMonsters rows*columns
+#define numberOfBullets numberOfMonsters+1
+#define screenHeight 800
+#define screenWidth 4003
+#define firstKubikY 70
+#define firstKubikX 35
 
 #endif

@@ -1,9 +1,8 @@
 #include "MonsterClass.h"
 #include "BulletClass.h"
 #include "Constants.h"
-#include "arraysToGraph.h"
 
-Kubik::Kubik(int x, int y, int n) {
+Kubik::Kubik(int x, int y) {
   for (int horz=0; horz<sideOfKubik; horz++) {
     for (int ver=0; ver<sideOfKubik; ver++) {
       allCoords[horz][ver][0] = x+horz;
@@ -12,14 +11,13 @@ Kubik::Kubik(int x, int y, int n) {
   }
   isDeleted = false;
   previousMillis = 0UL;
-  numberOfKubik = n;
-  allBullets[numberOfKubik] = Bullet(x, y, false);
+
+  pointerToALlBullets[numberOfKubik] = Bullet(x, y, false);
   coordOfTheTopLeftCorner[xCord] = x+sideOfKubik;
   coordOfTheTopLeftCorner[yCord] = y+sideOfKubik;
 }
 
 void Kubik::deleteMonstrik() {
-  allBullets[numberOfKubik].isDeleted = true;
   this->isDeleted = true;
 }
 

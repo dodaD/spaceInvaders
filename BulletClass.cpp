@@ -1,7 +1,5 @@
 #include "BulletClass.h"
 #include "Constants.h"
-#include "arraysToGraph.h"
-Bullet allBullets[NumberOfBullets];
 
 Bullet::Bullet(int x, int y, bool IsMovingUp) {
   returnBack(x, y);
@@ -17,16 +15,10 @@ void Bullet::move() {
   }
 
   for (int w=0; w<widthOfBullet; w++) {
-    for (int h=0; h<heightOfBullet; h++) {  
-      if(movingUp) {
-        allCoords[w][h][yCord] += 1;
-      }else {
-        allCoords[w][h][yCord] -= 1;
-      }
-      if(allCoords[w][h][yCord] == 99 || allCoords[w][h][yCord] == 0) {
-        stopMove = true;
-        returnBack(coordOfTheTopLeftCorner[xCord], coordOfTheTopLeftCorner[yCord]);
-        return;
+    for (int h=0; h<heightOfBullet; h++) {
+      allCoords[w][h][yCord] += (movingUp ? 1 : -1);
+      if(allCoords[w][h][yCord] >= 70 || allCoords[w][h][yCord] <= 0) {
+        haveReturned = true;
       }
     }
   }
@@ -42,7 +34,6 @@ void Bullet::returnBack(int x, int y) {
         allCoords[w][h][xCord] = x-w;
         allCoords[w][h][yCord] = y-h;
       }
-
     }
   }
 
