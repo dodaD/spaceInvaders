@@ -33,7 +33,8 @@ Kubik allMonstriks[rows][columns]; // TODO: rename
 Bullet allBullets[numberOfBullets];
 //Bullet* allBullets = allBulletsArray;
 Display display;
-bool moveWest = true; //TODO: rename west coast
+bool moveWest = true; //TODO: rename west coasot
+int numberOfMonColumns = columns;
 
 // put your setup code here, to run once:
 void setup() {
@@ -68,12 +69,12 @@ void setup() {
 }
 
 void loop() { // TODO: make it work mb idk
-  drawKubks(Black); //erase kubiks
+  drawKubiks(Black); //erase kubiks
   drawBullets(Black); //erase old one
   bulletsMove();
   drawBullets(White); //draw new one
 
-  checkCoordsOfMonsters();
+  checkCoordsOfMonsters();//check the direction of monsters moving
   for(int r=0; r<rows; r++) {
     for(int c=0; c<columns; c++) {
       allMonstriks[r][c].move(moveWest);
@@ -105,23 +106,33 @@ void loop() { // TODO: make it work mb idk
 }
 
 void bulletsMove() {
-  for (int i=0; i<numberOfBullets-1; i++) {
+  /*for (int i=0; i<numberOfBullets-1; i++) {
     allBullets[i].move();
     if(allBullets[i].haveReturned) {
-      allBullets[i].returnBack(allMonstriks[i].allCoords[sideOfKubik/2][sideOfKubik-1][xCord], allMonstriks[i].allCoords[sideOfKubik/2][sideOfKubik-1][yCord]);
+      int coordXOfMonstrik = allMonstriks[i].allCoords[sideOfKubik/2][sideOfKubik-1][xCord];
+      int coordYOfMonstrik = allMonstriks[i].allCoords[sideOfKubik/2][sideOfKubik-1][yCord];
+      allBullets[i].returnBack(coordXofMonstrik, coordYOfMonstrik);
       allBullets[i].haveReturned = false;
     }
-  }
+  }*/
+
   allBullets[numberOfBullets-1].move();
 }
 
 void checkCoordsOfMonsters() {
-  for (int i=0; i<numberOfMonsters; i++) {
-    if(allMonstriks[i].allCoords[0][0][xCord] <= 0+moveDistance) {
-      moveWest = false;
-    }else if(allMonstriks[i].allCoords[sideOfKubik-1][sideOfKubik-1][xCord] >= 70-moveDistance) {
-      moveWest = true;
-    } 
+  if(allMonstriks[0][columns - numberOfMonColumns].isDeleted || allMonstriks[0][numberOfMonColumns - 1].isDeleted) {
+    numberOfMonColumns--;
+  } //check if the first or the last column is deleted
+
+  Kubik firstKubik = allMonstriks[0][columns - numberOfMonColumns];
+  Kubik lastKubik = allMonstriks[0][numberOfMonColumns - 1];
+  if(firstKubik.allCoords[0][0][xCord] <= 0+moveDistance) {
+    moveWest = false;
+    return;
+  }
+  if(lastKubik.allCoords[sideOfKubik-1][sideOfKubik-1][xCord] >= 70-moveDistance) {
+    moveWest = true;
+    return;
   }
 }
 
@@ -148,9 +159,12 @@ void createMonstersAndBullets() {
   for(int r=0; r<rows; r++) {
     for(int c=0; c<columns; c++) {
       allMonstriks[r][c] = Kubik(firstKubikX+allMonstriks[r][c-1].coordOfTheTopLeftCorner[xCord]+1, firstKubikY+allMonstriks[r-1][c].coordOfTheTopLeftCorner[yCord]+2);
-      allBullets[r*c+1] = Bullet(allMonstriks[r][c].allCoords[sideOfKubik/2][0], allMonstriks[r][c].allCoords[0][sideOfKubik/2],false);
     }
   }
+}
+
+void createBullet() {
+  allBullets[i] = Bullet(allMonstriks[0][c].allCoords[sideOfKubik/2][0], allMonstriks[r][c].allCoords[0][sideOfKubik/2],false);
 }
 
 void drawKubiks(int colour) {
