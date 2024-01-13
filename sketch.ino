@@ -30,11 +30,10 @@
 #include "Display.h"
 
 Kubik allMonstriks[rows][columns]; // TODO: rename
-Bullet allBullets[numberOfBullets];
-//Bullet* allBullets = allBulletsArray;
+Bullet allBulets[numberOfBullets];
 Display display;
-bool moveWest = true; //TODO: rename west coasot
-int numberOfMonColumns = columns;
+bool moveWest = true; // TODO: rename west coast
+int monstersColumns[columns];
 
 // put your setup code here, to run once:
 void setup() {
@@ -69,15 +68,17 @@ void setup() {
 }
 
 void loop() { // TODO: make it work mb idk
-  drawKubiks(Black); //erase kubiks
+  drawKubiks(Black); //erase kubiks // TODO: drawKubiks andBullets may be one func
   drawBullets(Black); //erase old one
   bulletsMove();
   drawBullets(White); //draw new one
 
   checkCoordsOfMonsters();//check the direction of monsters moving
+  monstersReachedScreenEnd();
+  
   for(int r=0; r<rows; r++) {
     for(int c=0; c<columns; c++) {
-      allMonstriks[r][c].move(moveWest);
+      allMonstriks[r][c].move(moveWest); // TODO: be continued...
       bool haveCrushed = checkCollision(allMonstriks[r][c]);
       if(haveCrushed) {
           allMonstriks[r][c].deleteMonstrik();
@@ -86,6 +87,9 @@ void loop() { // TODO: make it work mb idk
         }
     }
   }
+  // TODO: create an array with collumns and amount of monsters in it; 
+  // we check first and a last column if any monstrick reached the end the 
+  // direction switched.if there is no monstricks, column skipped 
 
 
   /*for (int i=0; i<numberOfMonsters; i++) {
@@ -156,20 +160,42 @@ void checkCoordsOfMonsters() {
 //}
 
 void createMonstersAndBullets() {
+  /*for(int r=0; r<rows; r++) {
+    for(int c=0; c<columns; c++) {
+      allMonstriks[r][c] = Kubik( // TODO: rename Kubik
+        firstKubikX+allMonstriks[r][c - 1].coordOfTheTopLeftCorner[xCord] + 1,  // TODO: c - 1 when c = 0 -> error
+        // TODO: rename | firstKubikX startPositionX | allMonstriks allMonsters | xCord xCoords |  
+        
+        firstKubikY+allMonstriks[r - 1][c].coordOfTheTopLeftCorner[yCord] + 2
+      );
+    }
+  }*/
+
+  for(int i=0; i<columns; i++) {
+    monstersColumns[i] = rows;
+  }//Creating an array with columns with monsters and amount of monsters in it
+
   for(int r=0; r<rows; r++) {
     for(int c=0; c<columns; c++) {
-      allMonstriks[r][c] = Kubik(firstKubikX+allMonstriks[r][c-1].coordOfTheTopLeftCorner[xCord]+1, firstKubikY+allMonstriks[r-1][c].coordOfTheTopLeftCorner[yCord]+2);
+      allMonsters[r][c] = Monster(
+      startPositionX + c * sideOfKubik + 1 * sideOfKubik,
+      startPositionY + r * sideOfKubik + 2 * sideOfKubik
+      );
     }
   }
 }
 
 void createBullet() {
-  allBullets[i] = Bullet(allMonstriks[0][c].allCoords[sideOfKubik/2][0], allMonstriks[r][c].allCoords[0][sideOfKubik/2],false);
+  allBullets[i] = Bullet(
+    allMonsters[0][c].[sideOfKubik/2][0],
+    allMonsters[r][c].allCoords[0][sideOfKubik/2],
+    false
+  );
 }
 
 void drawKubiks(int colour) {
   for (int i=0; i<numberOfMonsters; i++) {
-    drawKubik(allMonstriks[i], colour);
+    drawKubik(allMonsters[i], colour);
   }
 }
 
@@ -179,7 +205,11 @@ void drawKubik(Kubik instance, int colour) {
   }
   for (int horz=0; horz<sideOfKubik; horz++) {
     for (int ver=0; ver<sideOfKubik; ver++) {
-     display.drawPixel(adjustCoordX(instance.allCoords[horz][ver][xCord]), adjustCoordY(instance.allCoords[horz][ver][yCord]), colour);
+      display.drawPixel(
+        adjustCoordX(instance.allCoords[horz][ver][xCord]),
+        adjustCoordY(instance.allCoords[horz][ver][yCord]),
+        colour
+      );
     }
   }
 }
@@ -196,7 +226,11 @@ void drawBullet(Bullet instance,int colour) {
   }
   for (int w=0; w<widthOfBullet; w++) {
     for (int h=0; h<heightOfBullet; h++) {
-      display.drawPixel(adjustCoordX(instance.allCoords[w][h][xCord]), adjustCoordY(instance.allCoords[w][h][yCord]), colour);
+      display.drawPixel(
+        adjustCoordX(instance.allCoords[w][h][xCord]),
+        adjustCoordY(instance.allCoords[w][h][yCord]),
+        colour
+      );
     }
   }
 }

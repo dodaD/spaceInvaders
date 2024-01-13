@@ -2,7 +2,7 @@
 #include "BulletClass.h"
 #include "Constants.h"
 
-Kubik::Kubik(int x, int y) {
+Monster::Monster(int x, int y) {
   for (int horz=0; horz<sideOfKubik; horz++) {
     for (int ver=0; ver<sideOfKubik; ver++) {
       allCoords[horz][ver][0] = x+horz;
@@ -17,11 +17,11 @@ Kubik::Kubik(int x, int y) {
   coordOfTheTopLeftCorner[yCord] = y+sideOfKubik;
 }
 
-void Kubik::deleteMonstrik() {
+void Monster::deleteMonstrik() {
   this->isDeleted = true;
 }
 
-void Kubik::move(bool goingWest) {
+void Monster::move(bool goingWest) {
   if(isDeleted) {
     return;
   }

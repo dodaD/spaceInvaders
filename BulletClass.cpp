@@ -10,7 +10,7 @@ Bullet::Bullet(int x, int y, bool IsMovingUp) {
 };
 
 void Bullet::move() {
-  if(stopMove || isDeleted) {
+  if(stopMove         || isDeleted) {
     return;
   }
 

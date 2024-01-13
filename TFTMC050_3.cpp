@@ -8,7 +8,7 @@
 // ------------------------------------------------------------ SPI Drive --------------------------------------------------------------------
 #if Arduino_SPI
 void ER5517Basic::SPIInit()
-{
+     {
 	pinMode(LCD_CS, OUTPUT);
 	SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
 	SPI.begin();

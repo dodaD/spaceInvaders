@@ -1,8 +1,8 @@
 #ifndef Constans_h
 #define Constans_h
 
-#define xCord 0
-#define yCord 1
+#define xCoord 0
+#define yCoord 1
 #define heightOfBullet 4 // TODO rename to something that makes sense 
 #define widthOfBullet 1
 #define sideOfKubik 5
@@ -18,7 +18,7 @@
 #define numberOfBullets columns
 #define screenHeight 800
 #define screenWidth 4003
-#define firstKubikY 70
-#define firstKubikX 35
+#define startPositionX 70
+#define startPositionY 35
 
 #endif
