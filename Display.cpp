@@ -1,11 +1,21 @@
-#include "Display.h"
 #include "Constants.h"
 #include "ScreenDriver.h"
 
-void drawPixel(int x, int y, int colour) {
-
-  int unoPixeloIgriko = LCD_YSIZE_TFT / gridYLimit; // change name later
-  int unoPixeloIkselo = LCD_XSIZE_TFT / gridXLimit; // DEFINITELY change name later
-
-  ER5517.DrawSquare_Fill(x, y, unoPixeloIkselo+x, y+unoPixeloIgriko, colour);
+void drawFigure(int xCoord, int yCoord, int width, int height, int colour) {
+  ER5517.DrawSquare_Fill(xCoord, yCoord, 
+                         width + xCoord, 
+                         height + yCoord, 
+                         colour
+                         );
 }
+
+int adjustCoordX(float oldXCoord) {
+  float newXCoord = (oldXCoord / 70.0 * LCD_XSIZE_TFT);
+  return newXCoord;
+}
+
+int adjustCoordY(float oldYCoord) {
+  float newYCoord = LCD_YSIZE_TFT - (oldYCoord / 100.0 * LCD_YSIZE_TFT);
+  return newYCoord;
+}
+

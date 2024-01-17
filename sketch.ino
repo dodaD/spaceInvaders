@@ -2,7 +2,7 @@
 #include "MonsterClass.h"
 #include "Constants.h"
 #include "ScreenDriver.h"
-#include "rendingFunctions.cpp"
+#include "Display.cpp"
 
 Monster allMonsters[rows][columns];
 Bullet allBulets[numberOfBullets];
@@ -11,6 +11,8 @@ char monstersMovingDirection = 'L';
 int monstersColumns[columns];
 int allMonstersCoords[rows][columns][2];
 int allBulletsCoords[columns][bulletsPerColumn][2];
+int spaceShipBullet[2];
+unsigned long previousMillis;
 
 void setup() {
   allBullets[numberOfBullets-1] = Bullet(35, 0, true); // TODO: rename
@@ -44,16 +46,26 @@ void setup() {
 }
 
 void loop() { // TODO: make it work mb idk
-  drawMonsters(Black); //erase Monsters
-  drawBullets(Black); //erase old one
+  for(int c = 0; c < columns; c++) {
+    for(int n = numberOfBullets; n++) {
+      drawFigure(allBuletsCoords[c][n][xCoord],
+                 allBuletsCoords[c][n][yCoord],
+                 widthOfBullet,
+                 heightOfBullet-1,
+                 Black
+                 );
+    }
+  }
+  //drawBullets(Black); //erase Monsters ^^^^^^^^^
+  drawMonsters(Black); //erase old one
   bulletsMove();
   drawBullets(White); //draw new one
 
   checkDirectionOfMonsters();
   monstersReachedScreenEnd();
   
-  for(int r=0; r<rows; r++) {
-    for(int c=0; c<columns; c++) {
+  for(int r = 0; r < rows; r++) {
+    for(int c = 0; c < columns; c++) {
       moveMonster(r, c); // TODO: be continued...
       bool haveCrushed = checkCollision(allMonstriks[r][c]);
       if(haveCrushed) {
@@ -83,14 +95,14 @@ void bulletsMove() {
 }
 
 void moveMonster(int column, int row) {
-  if(isDeleted) {
-    return;
-  }
   unsigned long currentMillis = millis();
 
   if(currentMillis - previousMillis > interval) {
     for (int horz=0; horz<sideOfMonster; horz++) {
       for (int ver=0; ver<sideOfMonster; ver++) {
+        if(isDeleted) {
+          return;
+        }
         if (monstersMovingDirection == 'L') {
           allMonstersCoords[row][column][xCoord] -= moveDistance;
         } else {
@@ -109,7 +121,7 @@ void checkDirectionOfMonsters() {
         if(allMonsters[r][i].isDeleted) {
           continue;
         }
-        if(allMonsters[r][c].coordOfTheTopLeftCorner[xCoord] <= 0) {
+        if(allMonstersCoords[r][c][xCoord] <= 0) {
           monstersMovingDirection = 'R';
           break;
         }
@@ -120,10 +132,10 @@ void checkDirectionOfMonsters() {
   for(int c=columns; c>0; c--) {
     if(monstersColumns[c] != 0) { 
       for(int r=0; r<rows; r++) {
-        if(allMonsters[r][i].isDeleted) {
+        if(allMonsters[r][c].isDeleted) {
           continue;
         }
-        if(allMonsters[r][c].coordOfTheTopLeftCorner[xCoord] >= 70) {
+        if(allMonstersCoords[r][c][xCoord] >= 70) {
           monstersMovingDirection = 'L';
           break;
         }
@@ -143,12 +155,15 @@ void createMonstersAndBullets() {
         startPositionY + b * sideOfMonster + 2 * b;
     }
   }
+  spaceShipBullet[xCoord] = 35;
+  spaceShipBullet[yCoord] = 20;
 
   for(int r = 0; r < rows; r++) {
     for(int c = 0; c < columns; c++) {
       allMonstersCoords[r][c] = 
       startPositionX + c * sideOfMonster + 1 * c,
       startPositionY + r * sideOfMonster + 2 * r;
+      allMonsters[r][c] = Kubik;
     }
   }
 }

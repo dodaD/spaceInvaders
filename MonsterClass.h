@@ -7,15 +7,11 @@
 
 class Monster {
 public:
-  Monster(){
-    // Default constructor body
-    // You can initialize member variables if necessary
+  Monster() {
+    isDeleted = false;
   }
   void deleteMonstrik();
-  void move(char directionOfMovement);
   bool isDeleted;
-  unsigned long previousMillis;
-  int coordOfTheTopLeftCorner[2]; // TODO: should be in sketch.ino
 };
 
 #endif
