@@ -3,8 +3,8 @@
 #include "Constants.h"
 
 Monster::Monster(int x, int y) {
-  for (int horz=0; horz<sideOfKubik; horz++) {
-    for (int ver=0; ver<sideOfKubik; ver++) {
+  for (int horz=0; horz<sideOfMonster; horz++) {
+    for (int ver=0; ver<sideOfMonster; ver++) {
       allCoords[horz][ver][0] = x+horz;
       allCoords[horz][ver][1] = y+ver;
     }
@@ -12,25 +12,25 @@ Monster::Monster(int x, int y) {
   isDeleted = false;
   previousMillis = 0UL;
 
-  pointerToALlBullets[numberOfKubik] = Bullet(x, y, false);
-  coordOfTheTopLeftCorner[xCord] = x+sideOfKubik;
-  coordOfTheTopLeftCorner[yCord] = y+sideOfKubik;
+  pointerToALlBullets[numberOfMonster] = Bullet(x, y, false);
+  coordOfTheTopLeftCorner[xCoord] = x+sideOfMonster;
+  coordOfTheTopLeftCorner[yCoord] = y+sideOfMonster;
 }
 
 void Monster::deleteMonstrik() {
   this->isDeleted = true;
 }
 
-void Monster::move(bool goingWest) {
+void Monster::move(char directionOfMovement) {
   if(isDeleted) {
     return;
   }
   unsigned long currentMillis = millis();
 
   if(currentMillis - previousMillis > interval) {
-    for (int horz=0; horz<sideOfKubik; horz++) {
-      for (int ver=0; ver<sideOfKubik; ver++) {
-        if (goingWest) {
+    for (int horz=0; horz<sideOfMonster; horz++) {
+      for (int ver=0; ver<sideOfMonster; ver++) {
+        if (directionOfMovement == 'L') {
           allCoords[horz][ver][0] -= moveDistance;
         } else {
           allCoords[horz][ver][0] += moveDistance;

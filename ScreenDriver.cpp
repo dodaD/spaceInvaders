@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "TFTMC050_3.h"
+#include "ScreenDriver.h"
 #include <SPI.h>
 
 #define  LCD_RESET  9

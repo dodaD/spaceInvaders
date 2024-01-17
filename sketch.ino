@@ -1,41 +1,17 @@
-// TODO: зробити штуку яка буде перетворювати координати сітки під координати екрану
-
-// ---- DONE
-// ~13 mosters, continious moving slowly, shooting
-// player's bullet shoots back continiously
-// player's bullet can kill monsters 
-
-// ---- TO BE DONE
-// player's ship, can be moved with stick, shooting when button clicked - one at a time
-// mosters bullet can kill player's ship - after this, blinking invulnerable - 2s
-// ship has 3 (depends on difficulty) lives, game over when no lives left - you can restart game
-// if all monsters are dead, you won the game
-// render monsters istead of boxes
-
-// ---- TO BE DONE 2
-// list of games - you highlight game, you can run it
-// when open game you see title and pic / author / whatever
-// "start game" - when you click, you choosing difficulty level, also "quit" - back to menu, "leaderloard"
-// "leaderboard" - when you click, you open a table with row number and score sorted, only 20 top scorers
-// "start game" - game starts 
-// when you lose or win, you see leaderboard with your position
-// when you lose, you can choose between replay or exit to start menu
-// game needs score, need counting logic + visible for player
-
-
 #include "BulletClass.h"
 #include "MonsterClass.h"
 #include "Constants.h"
-#include "TFTMC050_3.h" // TODO: rename
-#include "Display.h"
+#include "ScreenDriver.h"
+#include "rendingFunctions.cpp"
 
-Kubik allMonstriks[rows][columns]; // TODO: rename
+Monster allMonsters[rows][columns];
 Bullet allBulets[numberOfBullets];
-Display display;
-bool moveWest = true; // TODO: rename west coast
+char monstersMovingDirection = 'L'; 
+//TODO: google about enum
 int monstersColumns[columns];
+int allMonstersCoords[rows][columns][2];
+int allBulletsCoords[columns][bulletsPerColumn][2];
 
-// put your setup code here, to run once:
 void setup() {
   allBullets[numberOfBullets-1] = Bullet(35, 0, true); // TODO: rename
   Serial.begin(9600);
@@ -44,7 +20,7 @@ void setup() {
   pinMode(2,   OUTPUT);
   digitalWrite(2, HIGH);//Disable  RTP   
   
-  // ya hz
+  // WARNING: ya hz
   ER5517.Parallel_Init();
   ER5517.HW_Reset();
   ER5517.System_Check_Temp();
@@ -68,53 +44,36 @@ void setup() {
 }
 
 void loop() { // TODO: make it work mb idk
-  drawKubiks(Black); //erase kubiks // TODO: drawKubiks andBullets may be one func
+  drawMonsters(Black); //erase Monsters
   drawBullets(Black); //erase old one
   bulletsMove();
   drawBullets(White); //draw new one
 
-  checkCoordsOfMonsters();//check the direction of monsters moving
+  checkDirectionOfMonsters();
   monstersReachedScreenEnd();
   
   for(int r=0; r<rows; r++) {
     for(int c=0; c<columns; c++) {
-      allMonstriks[r][c].move(moveWest); // TODO: be continued...
+      moveMonster(r, c); // TODO: be continued...
       bool haveCrushed = checkCollision(allMonstriks[r][c]);
       if(haveCrushed) {
           allMonstriks[r][c].deleteMonstrik();
           allBullets[r*c+1].isDeleted = true;
           allBullets[numberOfBullets-1].returnBack(35, 0);
+          monstersColumns[c]--;
         }
     }
   }
-  // TODO: create an array with collumns and amount of monsters in it; 
-  // we check first and a last column if any monstrick reached the end the 
-  // direction switched.if there is no monstricks, column skipped 
 
-
-  /*for (int i=0; i<numberOfMonsters; i++) {
-    allMonstriks[i].move(moveWest);
-    bool haveCrushed = checkCollision(allMonstriks[i]);
-    if(haveCrushed) {
-      drawBullet(allBullets[numberOfBullets-1], Black);
-      allBullets[numberOfBullets-1].returnBack(35, 0);
-      drawBullet(allBullets[numberOfBullets-1], White);
-      allBullets[numberOfBullets-1].stopMove = true;
-      drawKubik(allMonstriks[i], Black);
-      drawBullet(allBullets[i], Black);
-      allMonstriks[i].deleteMonstrik();
-      allBullets[i].isDeleted = true;
-    }
-  }*/
-  drawKubiks(White); //draw new one
+  drawMonsters(White); //draw new one
 }
 
 void bulletsMove() {
   /*for (int i=0; i<numberOfBullets-1; i++) {
     allBullets[i].move();
     if(allBullets[i].haveReturned) {
-      int coordXOfMonstrik = allMonstriks[i].allCoords[sideOfKubik/2][sideOfKubik-1][xCord];
-      int coordYOfMonstrik = allMonstriks[i].allCoords[sideOfKubik/2][sideOfKubik-1][yCord];
+      int coordXOfMonstrik = allMonstriks[i].allCoords[sideOfMonster/2][sideOfMonster-1][xCoord];
+      int coordYOfMonstrik = allMonstriks[i].allCoords[sideOfMonster/2][sideOfMonster-1][yCoord];
       allBullets[i].returnBack(coordXofMonstrik, coordYOfMonstrik);
       allBullets[i].haveReturned = false;
     }
@@ -123,142 +82,97 @@ void bulletsMove() {
   allBullets[numberOfBullets-1].move();
 }
 
-void checkCoordsOfMonsters() {
-  if(allMonstriks[0][columns - numberOfMonColumns].isDeleted || allMonstriks[0][numberOfMonColumns - 1].isDeleted) {
-    numberOfMonColumns--;
-  } //check if the first or the last column is deleted
-
-  Kubik firstKubik = allMonstriks[0][columns - numberOfMonColumns];
-  Kubik lastKubik = allMonstriks[0][numberOfMonColumns - 1];
-  if(firstKubik.allCoords[0][0][xCord] <= 0+moveDistance) {
-    moveWest = false;
+void moveMonster(int column, int row) {
+  if(isDeleted) {
     return;
   }
-  if(lastKubik.allCoords[sideOfKubik-1][sideOfKubik-1][xCord] >= 70-moveDistance) {
-    moveWest = true;
-    return;
+  unsigned long currentMillis = millis();
+
+  if(currentMillis - previousMillis > interval) {
+    for (int horz=0; horz<sideOfMonster; horz++) {
+      for (int ver=0; ver<sideOfMonster; ver++) {
+        if (monstersMovingDirection == 'L') {
+          allMonstersCoords[row][column][xCoord] -= moveDistance;
+        } else {
+          allMonstersCoords[row][column][xCoord] += moveDistance;
+        }
+      }
+    }
+    previousMillis = currentMillis;
   }
 }
 
-//void createMonsters() {
-//  int gap = 0;
-//  // TODO: gap ne potriben
-//  int rowGap = 0;
-//
-//  for(int i=0; i<numberOfMonsters; i++) {
-//    gap = (i + columns) % columns;
-//    rowGap = (i + rows) % rows;
-//    // FIXME: i+n means duplicates in array on different rows, same number
-//    allMonstriks[i] = Kubik(
-//          firstKubikX+gap+sideOfKubik*i,
-//          firstKubikY+sideOfKubik+rowGap,
-//          i,
-//          allBullets
-//      );
-//    // TODO: podumati nad cim (dvumernij-masiv)
-//  }
-//}
+void checkDirectionOfMonsters() {
+  for(int c=0; c<columns; c++) {
+    if(monstersColumns[c] != 0) { 
+      for(int r=0; r<rows; r++) {
+        if(allMonsters[r][i].isDeleted) {
+          continue;
+        }
+        if(allMonsters[r][c].coordOfTheTopLeftCorner[xCoord] <= 0) {
+          monstersMovingDirection = 'R';
+          break;
+        }
+      }
+    }
+  }
+
+  for(int c=columns; c>0; c--) {
+    if(monstersColumns[c] != 0) { 
+      for(int r=0; r<rows; r++) {
+        if(allMonsters[r][i].isDeleted) {
+          continue;
+        }
+        if(allMonsters[r][c].coordOfTheTopLeftCorner[xCoord] >= 70) {
+          monstersMovingDirection = 'L';
+          break;
+        }
+      }
+    }
+  }
+}
+
 
 void createMonstersAndBullets() {
-  /*for(int r=0; r<rows; r++) {
-    for(int c=0; c<columns; c++) {
-      allMonstriks[r][c] = Kubik( // TODO: rename Kubik
-        firstKubikX+allMonstriks[r][c - 1].coordOfTheTopLeftCorner[xCord] + 1,  // TODO: c - 1 when c = 0 -> error
-        // TODO: rename | firstKubikX startPositionX | allMonstriks allMonsters | xCord xCoords |  
-        
-        firstKubikY+allMonstriks[r - 1][c].coordOfTheTopLeftCorner[yCord] + 2
-      );
+  for(int c = 0; c < columns; c++) {
+    monstersColumns[c] = rows;
+    for(int b = 0; b < bulletsPerColumn; b++) {
+      allBulletsCoords[c][b][xCoord] = 
+        startPositionX + c * sideOfMonster + 1 * c;
+      allBuletsCoords[c][b][yCoord] = 
+        startPositionY + b * sideOfMonster + 2 * b;
     }
-  }*/
+  }
 
-  for(int i=0; i<columns; i++) {
-    monstersColumns[i] = rows;
-  }//Creating an array with columns with monsters and amount of monsters in it
-
-  for(int r=0; r<rows; r++) {
-    for(int c=0; c<columns; c++) {
-      allMonsters[r][c] = Monster(
-      startPositionX + c * sideOfKubik + 1 * sideOfKubik,
-      startPositionY + r * sideOfKubik + 2 * sideOfKubik
-      );
+  for(int r = 0; r < rows; r++) {
+    for(int c = 0; c < columns; c++) {
+      allMonstersCoords[r][c] = 
+      startPositionX + c * sideOfMonster + 1 * c,
+      startPositionY + r * sideOfMonster + 2 * r;
     }
   }
 }
 
-void createBullet() {
-  allBullets[i] = Bullet(
-    allMonsters[0][c].[sideOfKubik/2][0],
-    allMonsters[r][c].allCoords[0][sideOfKubik/2],
-    false
-  );
-}
-
-void drawKubiks(int colour) {
-  for (int i=0; i<numberOfMonsters; i++) {
-    drawKubik(allMonsters[i], colour);
-  }
-}
-
-void drawKubik(Kubik instance, int colour) {
-  if(instance.isDeleted) {
-    return;
-  }
-  for (int horz=0; horz<sideOfKubik; horz++) {
-    for (int ver=0; ver<sideOfKubik; ver++) {
-      display.drawPixel(
-        adjustCoordX(instance.allCoords[horz][ver][xCord]),
-        adjustCoordY(instance.allCoords[horz][ver][yCord]),
-        colour
-      );
-    }
-  }
-}
-
-void drawBullets(int colour) {
-  for (int i=0; i<numberOfBullets; i++) {
-    drawBullet(allBullets[i], colour);
-  }
-}
-
-void drawBullet(Bullet instance,int colour) {
-  if(instance.isDeleted) {
-    return;
-  }
-  for (int w=0; w<widthOfBullet; w++) {
-    for (int h=0; h<heightOfBullet; h++) {
-      display.drawPixel(
-        adjustCoordX(instance.allCoords[w][h][xCord]),
-        adjustCoordY(instance.allCoords[w][h][yCord]),
-        colour
-      );
-    }
-  }
-}
-
-bool checkCollision(Kubik instance) {
+bool checkCollision(Monster instance) {
   if(allBullets[numberOfBullets-1].stopMove || instance.isDeleted) {
     return false;
   }
-  int xOfBullet = allBullets[numberOfBullets-1].allCoords[0][0][xCord];
-  int yOfBullet = allBullets[numberOfBullets-1].allCoords[0][0][yCord];
-  int xOfMonstrikLeft = instance.allCoords[0][0][xCord];
-  int yOfMonstrikLeft = instance.allCoords[0][0][yCord];
-  int xOfMonstrikRight = instance.allCoords[sideOfKubik-1][0][xCord];
-  int yOfMonstrikRight = instance.allCoords[0][sideOfKubik-1][yCord];
+  int xOfBullet = allBullets[numberOfBullets-1].allCoords[0][0][xCoord];
+  int yOfBullet = allBullets[numberOfBullets-1].allCoords[0][0][yCoord];
+  int xOfMonstrikLeft = instance.coordOfTheTopLeftCorner[xCoord];
+  int yOfMonstrikLeft = instance.allCoords[yCoord];
+  int xOfMonstrikRight = instance.coordOfTheTopLeftCorner[xCoord] 
+                         + sideOfMonster;
+  int yOfMonstrikRight = instance.coordOfTheTopLeftCorner[yCoord] 
+                         + sideOfMonster;
 
-  if(yOfBullet >= yOfMonstrikLeft && yOfBullet <= yOfMonstrikRight+heightOfBullet-1 && xOfBullet >= xOfMonstrikLeft && xOfBullet <= xOfMonstrikRight+widthOfBullet-1){
+  if(yOfBullet >= yOfMonstrikLeft 
+    && yOfBullet <= yOfMonstrikRight+heightOfBullet-1 
+    && xOfBullet >= xOfMonstrikLeft 
+    && xOfBullet <= xOfMonstrikRight+widthOfBullet-1
+    ){
     return true;
   }
 
   return false;
-}
-
-int adjustCoordX(float oldXCoord) {
-  float newXCoord = (oldXCoord / 70.0 * LCD_XSIZE_TFT);
-  return newXCoord;
-}
-
-int adjustCoordY(float oldYCoord) {
-  float newYCoord = LCD_YSIZE_TFT - (oldYCoord / 100.0 * LCD_YSIZE_TFT);
-  return newYCoord;
 }

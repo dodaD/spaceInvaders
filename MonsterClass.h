@@ -5,14 +5,14 @@
 #include "Constants.h"
 #include <Arduino.h>
 
-class Kubik {
+class Monster {
 public:
-  Monster() {
+  Monster(){
     // Default constructor body
     // You can initialize member variables if necessary
   }
   void deleteMonstrik();
-  void move(bool goingWest);
+  void move(char directionOfMovement);
   bool isDeleted;
   unsigned long previousMillis;
   int coordOfTheTopLeftCorner[2]; // TODO: should be in sketch.ino
