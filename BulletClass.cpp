@@ -1,15 +1,7 @@
 #include "BulletClass.h"
 #include "Constants.h"
 
-Bullet::Bullet(int x, int y, bool IsMovingUp) {
-  returnBack(x, y);
-  coordOfTheTopLeftCorner[xCoord] = x;
-  coordOfTheTopLeftCorner[yCoord] = y;
-  movingUp = IsMovingUp;
-  isDeleted = false;
-};
-
-void Bullet::move() {
+/*void Bullet::move() {
   if(stopMove || isDeleted) {
     return;
   }
@@ -22,9 +14,13 @@ void Bullet::move() {
       }
     }
   }
+})*/
+
+void Bullet::delete() {
+  isDeleted = true;
 }
 
-void Bullet::returnBack(int x, int y) {
+/*void Bullet::returnBack(int x, int y) {
   for (int w=0; w<widthOfBullet; w++) {
     for (int h=0; h<heightOfBullet; h++) {
       if(movingUp) {
@@ -41,5 +37,5 @@ void Bullet::returnBack(int x, int y) {
   coordOfTheTopLeftCorner[yCoord] = y+heightOfBullet;
   stopMove = false;
   haveReturned = true;
-}
+}*/
 

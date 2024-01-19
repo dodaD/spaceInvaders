@@ -7,20 +7,12 @@
 class Bullet {
   public:
     Bullet() {
-      // Default constructor body
-      // You can initialize member variables if necessary
+      isDeleted = false;
+      stopMove = false;
     }
-    Bullet(int x, int y, bool IsMovingUp);
-    void deleteOneself();
-    void move();
-    bool stopMove = false;
-    int allCoords[widthOfBullet][heightOfBullet][2];
-    void returnBack(int x, int y);
-    bool movingUp;
-    bool haveReturned;
+    void delete();
     bool isDeleted;
-  private:
-    int coordOfTheTopLeftCorner[2];
+    bool stopMove;
 };
 
 #endif
