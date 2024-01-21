@@ -75,9 +75,6 @@ void loop() { // TODO: make it work mb idk
 void bulletsMove() {
   for(int c = 0; c < columns; c++) {
     for(int b = 0; b < bulletsPerColumn; b++) {
-      if(allBullets[c][b].isDeleted || allBullets[c][b].stopMove) {
-        continue;
-      }
       if(allBulletsCoords[c][b][yCoord] <= 0) {
         allBulletsCoords[c][b][yCoord] = 20; //TODO: do it okay or smth :/
         continue;
@@ -86,7 +83,7 @@ void bulletsMove() {
     }
   }
 
-  if(spaceShipBullet.isDeleted || spaceShipBullet.stopMove) {
+  if(spaceShipBullet.stopMove) {
     return;
   }
   
@@ -109,8 +106,6 @@ void moveMonster(int column, int row) {
         }
         if (monstersMovingDirection == 'L') {
           allMonstersCoords[row][column][xCoord] -= moveDistance;
-        }else if(monstersMovingDirection == 'D') {
-          allMonstersCoords[row][column][yCoord] -= moveDistance;
         } else {
           allMonstersCoords[row][column][xCoord] += moveDistance;
         }
@@ -120,27 +115,16 @@ void moveMonster(int column, int row) {
   }
 }
 
-void lowerMonsters() {}
-  for(int r=0; r<rows; r++) {
-    for(int c=0; c<columns; c++) {
-      if(allMonsters[r][c].isDeleted) {
-        continue;
-      }
-      allMonstersCoords[r][c][yCoord] -= 1;
-    }
-  }
-}
-
-void checkDirectionOfMonsters() {
-  for(int c=0; c<columns; c++) {
-    if(monstersColumns[c] != 0) { 
-      for(int r=0; r<rows; r++) {
-        if(allMonsters[r][i].isDeleted) {
+void checkDirectionOfMonsters() { 
+  for (int c=0; c<columns; c++) {// TODO: <- re-write this loop(c below in func)
+    if (monstersColumns[c] != 0) { 
+      for (int r=0; r<rows; r++) {
+        if (allMonsters[r][i].isDeleted) {
           continue;
         }
-        if(allMonstersCoords[r][c][xCoord] <= 0
+        if (allMonstersCoords[r][c][xCoord] <= 0
           && allMonsters[r][c][yCoord] != 0
-          ) {          
+          ) {
           monstersMovingDirection = 'R';
           lowerMonsters();
           break;
@@ -149,13 +133,14 @@ void checkDirectionOfMonsters() {
     }
   }
 
-  for(int c=columns; c>0; c--) {
-    if(monstersColumns[c] != 0) { 
-      for(int r=0; r<rows; r++) {
-        if(allMonsters[r][c].isDeleted) {
+  for (int c=columns; c>0; c--) { // <- and this loop as one; switch columns
+                                  //  and rows
+    if (monstersColumns[c] != 0) { 
+      for (int r=0; r<rows; r++) {
+        if (allMonsters[r][c].isDeleted) {
           continue;
         }
-        if(allMonstersCoords[r][c][xCoord] >= 70
+        if (allMonstersCoords[r][c][xCoord] >= 70
           && allMonsters[r][c][yCoord] != 0
           ) {
           monstersMovingDirection = 'L';
@@ -179,7 +164,7 @@ void createMonstersAndBullets() {
   }
 
   for(int r = 0; r < rows; r++) {
-    monstersColumns[c] = rows; //TODO: ask about it
+    monstersColumns[c] = rows;
     for(int c = 0; c < columns; c++) {
       allMonstersCoords[r][c] = 
       startPositionX + c * sideOfMonster + 1 * c,
@@ -189,7 +174,7 @@ void createMonstersAndBullets() {
   }
 }
 
-//BUG:
+// BUG:
 bool checkCollision(Monster instance) {
   if(allBullets[numberOfBullets-1].stopMove || instance.isDeleted) {
     return false;
