@@ -11,8 +11,8 @@ void drawSquare(int xCoord, int yCoord, int width, int height, int colour) {
 
 void drawFigures(int (*array), int colour, string figure) {
   bool isBullet = figure == "bullet";
-  for (int d1 = 0; d1 < (isBullet ? columns : rows); d1++) {
-    for (int d2 = 0; d2 < (isBullet ? bulletsPerColumn : columns); d2++) {
+  for (auto d1: array) {
+    for (auto d2: d1) { // WARNING: check if auto is correct
       drawSquare(
         adjustCoordX(array[d1][d2][xCoord]),
         adjustCoordY(array[d1][d2][yCoord]),

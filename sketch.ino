@@ -1,19 +1,24 @@
 #include "BulletClass.h"
-#include "MonsterClass.h"
 #include "Constants.h"
 #include "ScreenDriver.h"
 #include "Display.cpp"
 
-Monster allMonsters[rows][columns];
 Bullet allBullets[columns][bulletsPerColumn];
 char monstersMovingDirection = 'L'; 
 //TODO: google about enum
 int monstersColumns[columns];
-int allMonstersCoords[rows][columns][2];
-int allBulletsCoords[columns][bulletsPerColumn][2];
 int spaceShipBulletCoord[2] = {35, 0};
 Bullet spaceShipBullet = Bullet;
+int startPositionX = 70;
+int startPositionY = 35;
 unsigned long previousMillis;
+
+struct Monster {
+  int xCoord;
+  int yCoord;
+  bool isDeleted;
+};
+Monster allMonsters[rows][columns];
 
 void setup() {
   allBullets[numberOfBullets-1] = Bullet(35, 0, true); // TODO: rename
@@ -48,12 +53,9 @@ void setup() {
 
 void loop() { // TODO: make it work mb idk
   drawFigures(&allBulletsCoords, Black, "bullet");
-  //drawBullets(Black); //erase Monsters ^^^^^^^^^
-  //drawMonsters(Black); //erase old one
   bulletsMove();
-  //drawBullets(White); //draw new one
 
-  checkDirectionOfMonsters();
+  changeDirectionOfMonsters();
   monstersReachedScreenEnd();
   
   for(int r = 0; r < rows; r++) {
@@ -69,7 +71,23 @@ void loop() { // TODO: make it work mb idk
     }
   }
 
-  //drawMonsters(White); //draw new one
+}
+
+void createMonsters() {
+  int columnGap = 1;
+  int rowGap = 2;
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < columns; c++) {
+      monstersColumns[c] = rows; //TODO: ask if I should keep it here
+      allMonstersCoords[r][c].xCoord = startPositionX +
+                                        c * sideOfMonster + 
+                                        columnGap * c;
+      allMonstersCoords[r][c].yCoord = startPositionY +
+                                        r * sideOfMonster + 
+                                        rowGap * r;
+      allMonsters[r][c].isDeleted = false;
+    }
+  }
 }
 
 void bulletsMove() {
@@ -95,6 +113,19 @@ void bulletsMove() {
   spaceShipBullet[yCoord] += 1;
 }
 
+void lowerMonsters() { 
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < columns; c++) {
+      allMonsters[r][c].yCoord -= 1;
+    }
+  }
+}
+
+void deleteMonster (int row, int column) {
+  allMonsters[row][column].isDeleted = true;
+  monstersColumns[c] -= 1;
+}
+
 void moveMonster(int column, int row) {
   unsigned long currentMillis = millis();
 
@@ -115,8 +146,29 @@ void moveMonster(int column, int row) {
   }
 }
 
-void checkDirectionOfMonsters() { 
-  for (int c=0; c<columns; c++) {// TODO: <- re-write this loop(c below in func)
+void changeDirectionOfMonsters() {
+  if (monstersMovingDirection == 'R') {
+    for (int c=columns; c>0; c--) { // <- and this loop as one; switch columns
+                                    //  and rows
+      if (monstersColumns[c] != 0) { 
+        for (int r=0; r<rows; r++) {
+          if (allMonsters[r][c].isDeleted) {
+            continue;
+          }
+          if (allMonstersCoords[r][c][xCoord] >= 70
+              && allMonsters[r][c][yCoord] != 0
+             ) {
+            monstersMovingDirection = 'L';
+            lowerMonsters();
+            break;
+          }
+        }
+      }
+    }
+    return;
+  }
+
+  for (int c=0; c<columns; c++) {// TODO: <- re-write this loop(c above in func)
     if (monstersColumns[c] != 0) { 
       for (int r=0; r<rows; r++) {
         if (allMonsters[r][i].isDeleted) {
@@ -130,46 +182,6 @@ void checkDirectionOfMonsters() {
           break;
         }
       }
-    }
-  }
-
-  for (int c=columns; c>0; c--) { // <- and this loop as one; switch columns
-                                  //  and rows
-    if (monstersColumns[c] != 0) { 
-      for (int r=0; r<rows; r++) {
-        if (allMonsters[r][c].isDeleted) {
-          continue;
-        }
-        if (allMonstersCoords[r][c][xCoord] >= 70
-          && allMonsters[r][c][yCoord] != 0
-          ) {
-          monstersMovingDirection = 'L';
-          lowerMonsters();
-          break;
-        }
-      }
-    }
-  }
-}
-
-void createMonstersAndBullets() {
-  for(int c = 0; c < columns; c++) {
-    for(int b = 0; b < bulletsPerColumn; b++) {
-      allBulletsCoords[c][b][xCoord] = 
-        startPositionX + c * widthOfBullet + 1 * c;
-      allBulletsCoords[c][b][yCoord] = 
-        startPositionY + b * heightOfBullet + 2 * b;
-      allBullets[c][b] = Bullet;
-    }
-  }
-
-  for(int r = 0; r < rows; r++) {
-    monstersColumns[c] = rows;
-    for(int c = 0; c < columns; c++) {
-      allMonstersCoords[r][c] = 
-      startPositionX + c * sideOfMonster + 1 * c,
-      startPositionY + r * sideOfMonster + 2 * r;
-      allMonsters[r][c] = Kubik;
     }
   }
 }
