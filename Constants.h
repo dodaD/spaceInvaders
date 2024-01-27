@@ -16,6 +16,5 @@
 #define shipHeight 3
 #define screenHeight 800
 #define screenWidth 4003
-#define bulletsPerColumn 2
 
 #endif

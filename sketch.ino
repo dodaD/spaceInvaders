@@ -1,24 +1,31 @@
-#include "BulletClass.h"
 #include "Constants.h"
 #include "ScreenDriver.h"
 #include "Display.cpp"
 
-Bullet allBullets[columns][bulletsPerColumn];
 char monstersMovingDirection = 'L'; 
 //TODO: google about enum
 int monstersColumns[columns];
 int spaceShipBulletCoord[2] = {35, 0};
-Bullet spaceShipBullet = Bullet;
 int startPositionX = 70;
 int startPositionY = 35;
 unsigned long previousMillis;
 
-struct Monster {
+typedef struct {
   int xCoord;
   int yCoord;
   bool isDeleted;
-};
+} Monster;
 Monster allMonsters[rows][columns];
+
+typedef struct {
+  int xCoord;
+  int yCoord;
+  bool isReadyToShoot;
+} Bullet;
+
+Bullet allBullets[maxBullets];
+Bullet spaceShipBullet;
+int maxBullets = 7 > column*rows ? column*rows : 7;
 
 void setup() {
   allBullets[numberOfBullets-1] = Bullet(35, 0, true); // TODO: rename
@@ -91,26 +98,24 @@ void createMonsters() {
 }
 
 void bulletsMove() {
-  for(int c = 0; c < columns; c++) {
-    for(int b = 0; b < bulletsPerColumn; b++) {
-      if(allBulletsCoords[c][b][yCoord] <= 0) {
-        allBulletsCoords[c][b][yCoord] = 20; //TODO: do it okay or smth :/
-        continue;
-      }
-      allBulletsCoords[c][b][yCoord] -= 1;
+  for(int b = 0; b < maxBullets; b++) {
+    if(allBullets.isReadyToShoot && rand() % 100 > 50 ) {
+      Monster randomMonster = getRandomMonster();
+      allBullets[b].xCoord = randomMonster.xCoord;
+      allBullets[b].yCoord = randomMonster.yCoord;
+      continue;
     }
+    allBullets[b].yCoord -= 1;
   }
+}
 
-  if(spaceShipBullet.stopMove) {
-    return;
+Monster getRandomMonster() {
+  int column = rand() % columns;
+  int row = rand() % rows;
+  if(allMonsters[row][column].isDeleted) {
+    return getRandomCoords();
   }
-  
-  if(spaceShipBulletCoord[yCoord] >= 70) {
-    spaceShipBullet.stopMove = true;
-    spaceShipBulletCoord[yCoord] = 0;
-    return;
-  }
-  spaceShipBullet[yCoord] += 1;
+  return allMonsters[row][column];
 }
 
 void lowerMonsters() { 
