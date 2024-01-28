@@ -24,8 +24,23 @@ typedef struct {
 } Bullet;
 
 Bullet allBullets[maxBullets];
-Bullet spaceShipBullet;
 int maxBullets = 7 > column*rows ? column*rows : 7;
+
+typedef struct {
+  int xCoord;
+  int yCoord;
+  bool isInvulnerable;
+} Ship;
+
+Ship spaceShip = {35, shipHeight, 3, true, false};
+Bullet spaceShipBullet; 
+
+typedef struct {
+  int score;
+  int lifes;
+} gameStats;
+
+gamesStats stats = {0, 3};
 
 void setup() {
   allBullets[numberOfBullets-1] = Bullet(35, 0, true); // TODO: rename
@@ -191,27 +206,45 @@ void changeDirectionOfMonsters() {
   }
 }
 
-// BUG:
-bool checkCollision(Monster instance) {
-  if(allBullets[numberOfBullets-1].stopMove || instance.isDeleted) {
-    return false;
-  }
-  int xOfBullet = allBullets[numberOfBullets-1].allCoords[0][0][xCoord];
-  int yOfBullet = allBullets[numberOfBullets-1].allCoords[0][0][yCoord];
-  int xOfMonstrikLeft = instance.coordOfTheTopLeftCorner[xCoord];
-  int yOfMonstrikLeft = instance.allCoords[yCoord];
-  int xOfMonstrikRight = instance.coordOfTheTopLeftCorner[xCoord] 
-                         + sideOfMonster;
-  int yOfMonstrikRight = instance.coordOfTheTopLeftCorner[yCoord] 
-                         + sideOfMonster;
+bool checkCollisionWithShip() {
+  for (int b = 0; b < maxBullets; b++) {
+    if (allBullets[b].isReadyToShoot) {
+      continue;
+    }
 
-  if(yOfBullet >= yOfMonstrikLeft 
-    && yOfBullet <= yOfMonstrikRight+heightOfBullet-1 
-    && xOfBullet >= xOfMonstrikLeft 
-    && xOfBullet <= xOfMonstrikRight+widthOfBullet-1
-    ){
-    return true;
+    if (spaceShip.yCoord >= allBullets[b].yCoord - heightOfBullet
+      && spaceShip.yCoord-shipHeight <= allBullets[b].yCoord
+      && spaceShip.xCoord >= allBullets[b].xCoord + widthOfBullet
+      && spaceShip.xCoord.shipWidth <= allBullets[b].xCoord
+      ){
+      allBullets[b].isReadyToShoot = true;
+      stats.lifes -= 1;
+      return true;
+    }
   }
-
   return false;
 }
+
+bool checkCollisionWithMonsters() {
+  for (int r = 0; r<rows; r++) {
+    for (int c = 0; c<columns; c++) {
+      if (allMonsters[r][c].isDeleted) {
+        continue;
+      }
+      if (allMonsters[r][c].yCoord >= spaceShip.yCoord - heightOfBullet
+          && allMonsters[r][c].yCoord-sideOfMonster <= spaceShip.yCoord
+          && allMonsters[r][c].xCoord <= spaceShip.xCoord+shipWidth
+          && allMonsters[r][c].xCoord+sideOfMonster >= spaceShip.xCoord
+         ){
+        allMonsters[r][c].isDeleted = true;
+        return true;
+      }
+    }
+  }
+}
+
+  void shootFromShip() {
+      if(!spaceShipBullet.isReadyToShoot) {
+          return;
+      }
+    }
