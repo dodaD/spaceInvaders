@@ -2,7 +2,7 @@
 #include "Display.h"
 #include "Constants.h"
 
-int previousMillisForMoving = 0;
+unsigned long previousMillisForMoving = 0UL;
 
 typedef struct {
   int xCoord;
@@ -62,18 +62,17 @@ void setup() {
 void loop() {
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
-      drawFigure(allMonsters[r][c].xCoord, allMonsters[r][c].xCoord, sideOfMonster, sideOfMonster, Black);
+
       moveMonsters();
-      drawFigure(allMonsters[r][c].xCoord, allMonsters[r][c].xCoord, sideOfMonster, sideOfMonster, White);
+      drawFigure(allMonsters[r][c].xCoord, 
+        allMonsters[r][c].yCoord,
+        sideOfMonster, 
+        sideOfMonster, 
+        White
+      );
     }
   }
-
-  for (int i = 0; i < maxBullets; i++) {
-    monsterShoot();
-    drawFigure(allBullets[i].xCoord, allBullets[i].yCoord, widthOfBullet, heightOfBullet, Green);
-  }
 }
-
 
 void shootFromShip() {
   if(!spaceShipBullet.isReadyToShoot) {
@@ -147,6 +146,7 @@ void createMonsters() {
       allMonsters[r][c].xCoord = startPositionX +
                                         c * sideOfMonster + 
                                         columnGap * c;
+      Serial.println(allMonsters[r][c].xCoord);
       allMonsters[r][c].yCoord = startPositionY +
                                         r * sideOfMonster + 
                                         rowGap * r;
@@ -158,7 +158,6 @@ void createMonsters() {
 void moveMonsters() {
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForMoving < interval) {
-    previousMillisForMoving = currentMillis;
     return;
   }
 
@@ -167,13 +166,25 @@ void moveMonsters() {
       if(allMonsters[r][c].isDeleted) {
       return;
       }
+      Serial.print("I exist-: ");
+      Serial.println(allMonsters[r][c].xCoord);
+      drawFigure(allMonsters[r][c].xCoord,
+          allMonsters[r][c].yCoord, 
+          sideOfMonster, 
+          sideOfMonster, 
+          Black
+          );
       if (monstersMovingDirection == 'L') {
+        Serial.println("WTF");
         allMonsters[r][c].xCoord -= moveDistanceForMonsters;
-      } else {
+        previousMillisForMoving = currentMillis;
+      } else if(monstersMovingDirection == 'R') {
         allMonsters[r][c].xCoord += moveDistanceForMonsters;
       }
     }
-  }
+  } 
+  monstersChangeDirection();
+  previousMillisForMoving = currentMillis;
 }
 
 void createBulletsForMonsters() {
@@ -185,15 +196,16 @@ void createBulletsForMonsters() {
 void monsterShoot() {
   for(int b = 0; b < maxBullets; b++) {
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
+      allBullets[b].isReadyToShoot = false;
       Monster randomMonster = getRandomMonster();
       allBullets[b].xCoord = randomMonster.xCoord;
       allBullets[b].yCoord = randomMonster.yCoord;
       continue;
     }
+    if(allBullets[b].yCoord < 0 + heightOfBullet) {
+        allBullets[b].isReadyToShoot = true;
+      }
     allBullets[b].yCoord -= 1;
-    if(!spaceShipBullet.isReadyToShoot) {
-      spaceShipBullet.yCoord += 1;
-    }
   }
 }
 
@@ -206,4 +218,51 @@ Monster getRandomMonster() {
   return allMonsters[row][column];
 }
 
+void monstersChangeDirection() { 
+  if (monstersMovingDirection == 'R') {
+    for (int c = columns; c > 0; c--) { 
+      if (monstersColumns[c] != 0) { 
+        for (int r = 0; r < rows; r++) {
+          if (allMonsters[r][c].isDeleted) {
+            continue;
+          }
+          if (allMonsters[r][c].xCoord >= 70
+              && allMonsters[r][c].yCoord != 0
+             ) {
+            Serial.print("I do not lmao: ");
+            Serial.println(allMonsters[r][c].xCoord);
+            monstersMovingDirection = 'L';
+            lowerMonsters();
+            return;
+            break;
+          }
+        }
+      }
+    }
+  }
 
+  for (int c=0; c<columns; c++) {// TODO: <- re-write this loop(c above in func)
+    if (monstersColumns[c] != 0) { 
+      for (int r=0; r<rows; r++) {
+        if (allMonsters[r][c].isDeleted) {
+          continue;
+        }
+        if (allMonsters[r][c].xCoord <= 0
+          && allMonsters[r][c].yCoord != 0
+          ) {
+          monstersMovingDirection = 'R';
+          lowerMonsters();
+          break;
+        }
+      }
+    }
+  }
+}
+
+void lowerMonsters() { 
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < columns; c++) {
+      allMonsters[r][c].yCoord -= 1;
+    }
+  }
+}

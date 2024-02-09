@@ -23,7 +23,7 @@ int adjustCoordY(float oldYCoord) {
 }
 
 void drawFigure(int x, int y, int width, int height, int colour) {
-  delay(500);
+  //delay(500);
   drawSquare(
     adjustCoordX(x),
     adjustCoordY(y),
