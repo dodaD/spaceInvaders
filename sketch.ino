@@ -146,7 +146,6 @@ void createMonsters() {
       allMonsters[r][c].xCoord = startPositionX +
                                         c * sideOfMonster + 
                                         columnGap * c;
-      Serial.println(allMonsters[r][c].xCoord);
       allMonsters[r][c].yCoord = startPositionY +
                                         r * sideOfMonster + 
                                         rowGap * r;
@@ -156,6 +155,7 @@ void createMonsters() {
 }
 
 void moveMonsters() {
+  monstersChangeDirection();
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForMoving < interval) {
     return;
@@ -166,8 +166,6 @@ void moveMonsters() {
       if(allMonsters[r][c].isDeleted) {
       return;
       }
-      Serial.print("I exist-: ");
-      Serial.println(allMonsters[r][c].xCoord);
       drawFigure(allMonsters[r][c].xCoord,
           allMonsters[r][c].yCoord, 
           sideOfMonster, 
@@ -175,16 +173,14 @@ void moveMonsters() {
           Black
           );
       if (monstersMovingDirection == 'L') {
-        Serial.println("WTF");
         allMonsters[r][c].xCoord -= moveDistanceForMonsters;
         previousMillisForMoving = currentMillis;
       } else if(monstersMovingDirection == 'R') {
         allMonsters[r][c].xCoord += moveDistanceForMonsters;
+        previousMillisForMoving = currentMillis;
       }
     }
   } 
-  monstersChangeDirection();
-  previousMillisForMoving = currentMillis;
 }
 
 void createBulletsForMonsters() {
@@ -219,41 +215,32 @@ Monster getRandomMonster() {
 }
 
 void monstersChangeDirection() { 
-  if (monstersMovingDirection == 'R') {
-    for (int c = columns; c > 0; c--) { 
-      if (monstersColumns[c] != 0) { 
-        for (int r = 0; r < rows; r++) {
-          if (allMonsters[r][c].isDeleted) {
-            continue;
-          }
-          if (allMonsters[r][c].xCoord >= 70
-              && allMonsters[r][c].yCoord != 0
-             ) {
-            Serial.print("I do not lmao: ");
-            Serial.println(allMonsters[r][c].xCoord);
-            monstersMovingDirection = 'L';
-            lowerMonsters();
-            return;
-            break;
-          }
-        }
+  for(int c = columns - 1; c > 0 && monstersMovingDirection == 'R'; c--) {
+    if(monstersColumns[c] == 0) {
+      continue;
+    }
+    for(int r = 0; r < rows; r++) {
+      if(allMonsters[r][c].isDeleted == true ) {
+        continue;
+      }
+      if(allMonsters[r][c].xCoord >= 70 ) {
+        monstersMovingDirection = 'L';
+        return;
       }
     }
   }
 
-  for (int c=0; c<columns; c++) {// TODO: <- re-write this loop(c above in func)
-    if (monstersColumns[c] != 0) { 
-      for (int r=0; r<rows; r++) {
-        if (allMonsters[r][c].isDeleted) {
-          continue;
-        }
-        if (allMonsters[r][c].xCoord <= 0
-          && allMonsters[r][c].yCoord != 0
-          ) {
-          monstersMovingDirection = 'R';
-          lowerMonsters();
-          break;
-        }
+  for(int c = 0; c < columns && monstersMovingDirection == 'L'; c++) {
+    if(monstersColumns[c] == 0) {
+      continue;
+    }
+    for(int r = 0; r < rows; r++) {
+      if(allMonsters[r][c].isDeleted == true ) {
+        continue;
+      }
+      if(allMonsters[r][c].xCoord <= 0 ) {
+        monstersMovingDirection = 'R';
+        return;
       }
     }
   }
