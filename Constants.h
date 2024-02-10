@@ -1,8 +1,8 @@
 #ifndef Constans_h
 #define Constans_h
 
-#define heightOfBullet 4 // TODO rename to something that makes sense 
-#define widthOfBullet 1
+#define heightOfBullet 7 // TODO rename to something that makes sense 
+#define widthOfBullet 4
 #define sideOfMonster 5
 #define gridYLimit 100
 #define gridXLimit 70
