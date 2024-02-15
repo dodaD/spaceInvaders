@@ -3,13 +3,16 @@
 #include "Constants.h"
 
 unsigned long previousMillisForMoving = 0UL;
+unsigned long previousMillisForInvulnerability = 0UL;
+unsigned long previousMillisForSpeedingUp = 0UL;
+unsigned long interval = 1000UL;
 
 typedef struct {
   int xCoord;
   int yCoord;
   bool isInvulnerable;
 }Ship;
-Ship spaceShip = {35, 20, false};
+Ship spaceShip = {60, 20, false};
 
 int monstersColumns[columns];
 char monstersMovingDirection = 'R';
@@ -25,6 +28,13 @@ typedef struct {
   int yCoord;
   bool isReadyToShoot;
 }Bullet;
+
+typedef struct {
+  int score;
+  int lifes;
+}Stats;
+
+Stats gamesStats= {0, 3};
 
 Bullet spaceShipBullet = {0, 0, true}; 
 const int maxBullets = 7 > columns * rows ? columns * rows : 7;
@@ -57,6 +67,7 @@ void setup() {
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   createMonsters();
   createBulletsForMonsters();
+  //checkCollisionWithMonsters();
 }
 
 void loop() {
@@ -69,7 +80,6 @@ void loop() {
         sideOfMonster, 
         White
       );
-      //monsterShoot();
     }
   }
   drawFigure(spaceShip.xCoord, 
@@ -78,8 +88,12 @@ void loop() {
       shipHeight, 
       White
       );
-  shootFromShip();
+  monsterShoot();
   moveShipBullets();
+  checkCollisionWithMonsters();
+  checkCollisionWithShip();
+  moveShip('R');
+  shootFromShip();
 }
 
 void shootFromShip() {
@@ -99,7 +113,7 @@ void moveShipBullets() {
         heightOfBullet, 
         Black
         );
-      if(spaceShipBullet.yCoord >= 70) {
+      if(spaceShipBullet.yCoord >= 70) {//?????
         spaceShipBullet.isReadyToShoot = true;
         return;
       }
@@ -111,6 +125,30 @@ void moveShipBullets() {
         Red
         );
     }
+}
+
+void checkCollisionWithMonsters() {
+  if (spaceShipBullet.isReadyToShoot) {
+    return false;
+  } else if (spaceShipBullet.yCoord >= gridYLimit){
+    return;
+  }
+  for (int r = 0; r<rows; r++) {
+    for (int c = 0; c<columns; c++) {
+      if (allMonsters[r][c].isDeleted) {
+        continue;
+      }
+      if (allMonsters[r][c].yCoord >= spaceShipBullet.yCoord - heightOfBullet
+          && allMonsters[r][c].yCoord-sideOfMonster <= spaceShipBullet.yCoord
+          && allMonsters[r][c].xCoord <= spaceShipBullet.xCoord+widthOfBullet
+          && allMonsters[r][c].xCoord+sideOfMonster >= spaceShipBullet.xCoord
+         ){
+        spaceShipBullet.isReadyToShoot = true;
+        allMonsters[r][c].isDeleted = true;
+        return;
+      }
+    }
+  }
 }
 
 void moveShip(char direction) {
@@ -171,6 +209,12 @@ void moveMonsters() {
   if(currentMillis - previousMillisForMoving < interval) {
     return;
   }
+  if(intervalForSpeedingUp <
+    currentMillis - previousMillisForSpeedingUp
+    ) {
+    interval -= 10UL;
+    previousMillisForSpeedingUp = currentMillis;
+  }
 
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
@@ -202,6 +246,7 @@ void createBulletsForMonsters() {
 }
  
 void monsterShoot() {
+  delay(50);//just for demonstration
   for(int b = 0; b < maxBullets; b++) {
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
       allBullets[b].isReadyToShoot = false;
@@ -238,6 +283,35 @@ Monster getRandomMonster() {
   return allMonsters[row][column];
 }
 
+void checkCollisionWithShip() {
+  unsigned long currentMillis = millis();
+  if (spaceShip.isInvulnerable &&
+      currentMillis - previousMillisForInvulnerability 
+      > intervalForInvulnerability) {
+      spaceShip.isInvulnerable = false;
+  } else if (spaceShip.isInvulnerable){
+    return;
+  }
+
+  for (int b = 0; b < maxBullets; b++) {
+    if (allBullets[b].isReadyToShoot) {
+      continue;
+    }
+
+    if (allBullets[b].xCoord + widthOfBullet >= spaceShip.xCoord &&
+        allBullets[b].xCoord <= spaceShip.xCoord + shipWidth &&
+        allBullets[b].yCoord >= spaceShip.yCoord - shipHeight &&
+        allBullets[b].yCoord - heightOfBullet <= spaceShip.yCoord
+      ){
+      allBullets[b].isReadyToShoot = true;
+      gamesStats.lifes -= 1;
+      spaceShip.isInvulnerable = true;
+      previousMillisForInvulnerability = currentMillis;
+      return;
+    }
+  }
+  return;
+}
 void monstersChangeDirection() { 
   for(int c = columns - 1; c > 0 && monstersMovingDirection == 'R'; c--) {
     if(monstersColumns[c] == 0) {

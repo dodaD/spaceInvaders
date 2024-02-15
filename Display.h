@@ -13,12 +13,12 @@ void drawSquare(int x, int y, int width, int height, int colour) {
 }
 
 int adjustCoordX(float oldXCoord) {
-  float newXCoord = (oldXCoord / 100.0 * LCD_XSIZE_TFT);
+  float newXCoord = (oldXCoord / gridXLimit * LCD_XSIZE_TFT);
   return newXCoord;
 }
 
 int adjustCoordY(float oldYCoord) {
-  float newYCoord = LCD_YSIZE_TFT - (oldYCoord / 70.0 * LCD_YSIZE_TFT);
+  float newYCoord = LCD_YSIZE_TFT - (oldYCoord / gridYLimit * LCD_YSIZE_TFT);
   return newYCoord;
 }
 
@@ -27,8 +27,8 @@ void drawFigure(int x, int y, int width, int height, int colour) {
   drawSquare(
     adjustCoordX(x),
     adjustCoordY(y),
-    width,
-    height,
+    width * LCD_XSIZE_TFT / gridXLimit,
+    height * LCD_XSIZE_TFT / gridYLimit,
     colour
   );
 }
