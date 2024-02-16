@@ -5,7 +5,7 @@
 unsigned long previousMillisForMoving = 0UL;
 unsigned long previousMillisForInvulnerability = 0UL;
 unsigned long previousMillisForSpeedingUp = 0UL;
-unsigned long interval = 1000UL;
+unsigned long interval = 500UL;
 
 typedef struct {
   int xCoord;
@@ -71,29 +71,57 @@ void setup() {
 }
 
 void loop() {
-  for (int r = 0; r < rows; r++) {
-    for (int c = 0; c < columns; c++) {
-      moveMonsters();
-    }
-  }
+  drawShip(White);
+  shootFromShip();
+  moveShipBullets();
+  checkCollisionWithMonsters();
+  checkCollisionWithShip();
+  moveMonsters();
+  monsterShoot();
+}
+
+void drawMonster(int r, int c, int colour) {
+  drawFigure(
+      allMonsters[r][c].xCoord,
+      allMonsters[r][c].yCoord,
+      sideOfMonster,
+      sideOfMonster,
+      colour
+      );
+}
+
+void drawShip(int colour) {
   drawFigure(spaceShip.xCoord, 
       spaceShip.yCoord,
       shipWidth, 
       shipHeight, 
-      White
+      colour
+  );
+}
+
+void drawMonstersBullet(int b, int colour) {
+  drawFigure(allBullets[b].xCoord,
+      allBullets[b].yCoord, 
+      widthOfBullet, 
+      heightOfBullet, 
+      colour
       );
-  monsterShoot();
-  moveShipBullets();
-  //checkCollisionWithMonsters();
-  checkCollisionWithShip();
-  moveShip('R');
-  shootFromShip();
+}
+
+void drawShipBullet(int colour) {
+  drawFigure(spaceShipBullet.xCoord,
+        spaceShipBullet.yCoord, 
+        widthOfBullet, 
+        heightOfBullet, 
+        colour
+   );
 }
 
 void shootFromShip() {
   if(!spaceShipBullet.isReadyToShoot) {
     return;
   }
+  drawShipBullet(Black);
   spaceShipBullet.isReadyToShoot = false;
   spaceShipBullet.xCoord = spaceShip.xCoord + shipWidth / 2;
   spaceShipBullet.yCoord = spaceShip.yCoord;
@@ -101,23 +129,13 @@ void shootFromShip() {
 
 void moveShipBullets() {
     if(!spaceShipBullet.isReadyToShoot) {
-      drawFigure(spaceShipBullet.xCoord,
-        spaceShipBullet.yCoord, 
-        widthOfBullet, 
-        heightOfBullet, 
-        Black
-        );
+      drawShipBullet(Black);
       if(spaceShipBullet.yCoord >= gridYLimit) {
         spaceShipBullet.isReadyToShoot = true;
         return;
       }       
       spaceShipBullet.yCoord += 1;
-      drawFigure(spaceShipBullet.xCoord,
-        spaceShipBullet.yCoord, 
-        widthOfBullet, 
-        heightOfBullet, 
-        Red
-        );
+      drawShipBullet(Red);
     }
 }
 
@@ -138,7 +156,7 @@ void checkCollisionWithMonsters() {
           && allMonsters[r][c].xCoord+sideOfMonster >= spaceShipBullet.xCoord
          ){
         spaceShipBullet.isReadyToShoot = true;
-
+        drawMonster(r, c, Black);
         allMonsters[r][c].isDeleted = true;
         return;
       }
@@ -147,39 +165,13 @@ void checkCollisionWithMonsters() {
 }
 
 void moveShip(char direction) {
+  drawShip(Black);
   if (direction == 'R' && spaceShip.xCoord < gridXLimit - shipWidth) {
-    drawFigure(
-      spaceShip.xCoord, 
-      spaceShip.yCoord, 
-      shipWidth, 
-      shipHeight,
-      Black
-    );
     spaceShip.xCoord += moveDistanceForShip;
-    drawFigure(
-      spaceShip.xCoord, 
-      spaceShip.yCoord,
-      shipWidth,
-      shipHeight,
-      White
-    );
-  } else if(spaceShip.xCoord > moveDistanceForShip && direction == 'L'){
-    drawFigure(
-      spaceShip.xCoord, 
-      spaceShip.yCoord, 
-      shipWidth, 
-      shipHeight,
-      Black
-    );
+  } else if(spaceShip.xCoord > moveDistanceForShip && direction == 'L') {
     spaceShip.xCoord -= moveDistanceForShip;
-    drawFigure(
-      spaceShip.xCoord, 
-      spaceShip.yCoord,
-      shipWidth,
-      shipHeight,
-      White
-    );
   }
+  drawShip(White);
 }
 
 void createMonsters() {
@@ -217,12 +209,7 @@ void moveMonsters() {
       if(allMonsters[r][c].isDeleted) {
       return;
       }
-      drawFigure(allMonsters[r][c].xCoord,
-          allMonsters[r][c].yCoord, 
-          sideOfMonster, 
-          sideOfMonster, 
-          Black
-          );
+      drawMonster(r, c, Black);
       if (monstersMovingDirection == 'L') {
         allMonsters[r][c].xCoord -= moveDistanceForMonsters;
         previousMillisForMoving = currentMillis;
@@ -230,12 +217,7 @@ void moveMonsters() {
         allMonsters[r][c].xCoord += moveDistanceForMonsters;
         previousMillisForMoving = currentMillis;
       }
-      drawFigure(allMonsters[r][c].xCoord,
-          allMonsters[r][c].yCoord, 
-          sideOfMonster, 
-          sideOfMonster, 
-          White
-          );
+      drawMonster(r, c, White);
     }
   } 
 }
@@ -247,7 +229,7 @@ void createBulletsForMonsters() {
 }
  
 void monsterShoot() {
-  delay(25);//just for demonstration
+  delay(25);//just for demonstrationdrawMonstersBullets
   for(int b = 0; b < maxBullets; b++) {
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
       allBullets[b].isReadyToShoot = false;
@@ -257,23 +239,16 @@ void monsterShoot() {
       // TODO: polagodyty ce po narmolnomu
       continue;
     }
-    drawFigure(allBullets[b].xCoord,
-        allBullets[b].yCoord, 
-        widthOfBullet, 
-        heightOfBullet, 
-        Black
-        );
+    drawMonstersBullet(b, Black);
+    if(allBullets[b].isReadyToShoot) {
+      continue;
+    }
     if(allBullets[b].yCoord < 0 + heightOfBullet) {
       allBullets[b].isReadyToShoot = true;
       return;
     }
     allBullets[b].yCoord -= 1;
-    drawFigure(allBullets[b].xCoord,
-      allBullets[b].yCoord, 
-      widthOfBullet, 
-      heightOfBullet, 
-      Green
-      );
+    drawMonstersBullet(b, Green);
   }
 }
 
@@ -306,6 +281,7 @@ void checkCollisionWithShip() {
         allBullets[b].yCoord >= spaceShip.yCoord - shipHeight &&
         allBullets[b].yCoord - heightOfBullet <= spaceShip.yCoord
       ){
+      drawMonstersBullet(b, Black);
       allBullets[b].isReadyToShoot = true;
       gamesStats.lifes -= 1;
       spaceShip.isInvulnerable = true;
@@ -343,7 +319,7 @@ void monstersChangeDirection() {
       }
       if(allMonsters[r][c].xCoord <= 0 ) {
         monstersMovingDirection = 'R';
-        lowerMonsters();
+        lowerMonsters(); 
         return;
       }
     }
@@ -356,11 +332,12 @@ void lowerMonsters() {
       if(allMonsters[r][c].isDeleted) {
         continue;
       }
+
       if(allMonsters[r][c].yCoord <= 0) {
         //loser print
         return;
       }
-
+      drawMonster(r, c, Black);
       allMonsters[r][c].yCoord -= 1;
     }
   }
