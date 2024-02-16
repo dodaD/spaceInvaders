@@ -17,7 +17,7 @@
 #define screenHeight 800
 #define screenWidth 4003
 #define startPositionX 30
-#define startPositionY 30
+#define startPositionY 80
 #define moveDistanceForMonsters 1
 
 #endif

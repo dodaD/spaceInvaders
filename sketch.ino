@@ -74,12 +74,6 @@ void loop() {
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
       moveMonsters();
-      drawFigure(allMonsters[r][c].xCoord, 
-        allMonsters[r][c].yCoord,
-        sideOfMonster, 
-        sideOfMonster, 
-        White
-      );
     }
   }
   drawFigure(spaceShip.xCoord, 
@@ -90,7 +84,7 @@ void loop() {
       );
   monsterShoot();
   moveShipBullets();
-  checkCollisionWithMonsters();
+  //checkCollisionWithMonsters();
   checkCollisionWithShip();
   moveShip('R');
   shootFromShip();
@@ -101,7 +95,7 @@ void shootFromShip() {
     return;
   }
   spaceShipBullet.isReadyToShoot = false;
-  spaceShipBullet.xCoord = spaceShip.xCoord;
+  spaceShipBullet.xCoord = spaceShip.xCoord + shipWidth / 2;
   spaceShipBullet.yCoord = spaceShip.yCoord;
 }
 
@@ -113,10 +107,10 @@ void moveShipBullets() {
         heightOfBullet, 
         Black
         );
-      if(spaceShipBullet.yCoord >= 70) {//?????
+      if(spaceShipBullet.yCoord >= gridYLimit) {
         spaceShipBullet.isReadyToShoot = true;
         return;
-      }
+      }       
       spaceShipBullet.yCoord += 1;
       drawFigure(spaceShipBullet.xCoord,
         spaceShipBullet.yCoord, 
@@ -144,6 +138,7 @@ void checkCollisionWithMonsters() {
           && allMonsters[r][c].xCoord+sideOfMonster >= spaceShipBullet.xCoord
          ){
         spaceShipBullet.isReadyToShoot = true;
+
         allMonsters[r][c].isDeleted = true;
         return;
       }
@@ -215,6 +210,7 @@ void moveMonsters() {
     interval -= 10UL;
     previousMillisForSpeedingUp = currentMillis;
   }
+  monstersChangeDirection();
 
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
@@ -227,7 +223,6 @@ void moveMonsters() {
           sideOfMonster, 
           Black
           );
-      monstersChangeDirection();
       if (monstersMovingDirection == 'L') {
         allMonsters[r][c].xCoord -= moveDistanceForMonsters;
         previousMillisForMoving = currentMillis;
@@ -235,6 +230,12 @@ void moveMonsters() {
         allMonsters[r][c].xCoord += moveDistanceForMonsters;
         previousMillisForMoving = currentMillis;
       }
+      drawFigure(allMonsters[r][c].xCoord,
+          allMonsters[r][c].yCoord, 
+          sideOfMonster, 
+          sideOfMonster, 
+          White
+          );
     }
   } 
 }
@@ -246,13 +247,14 @@ void createBulletsForMonsters() {
 }
  
 void monsterShoot() {
-  delay(50);//just for demonstration
+  delay(25);//just for demonstration
   for(int b = 0; b < maxBullets; b++) {
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
       allBullets[b].isReadyToShoot = false;
       Monster randomMonster = getRandomMonster();
-      allBullets[b].xCoord = randomMonster.xCoord;
-      allBullets[b].yCoord = randomMonster.yCoord;
+      allBullets[b].xCoord = randomMonster.xCoord + sideOfMonster / 2;
+      allBullets[b].yCoord = randomMonster.yCoord - sideOfMonster - 5;
+      // TODO: polagodyty ce po narmolnomu
       continue;
     }
     drawFigure(allBullets[b].xCoord,
@@ -263,6 +265,7 @@ void monsterShoot() {
         );
     if(allBullets[b].yCoord < 0 + heightOfBullet) {
       allBullets[b].isReadyToShoot = true;
+      return;
     }
     allBullets[b].yCoord -= 1;
     drawFigure(allBullets[b].xCoord,
@@ -312,6 +315,7 @@ void checkCollisionWithShip() {
   }
   return;
 }
+
 void monstersChangeDirection() { 
   for(int c = columns - 1; c > 0 && monstersMovingDirection == 'R'; c--) {
     if(monstersColumns[c] == 0) {
@@ -321,7 +325,7 @@ void monstersChangeDirection() {
       if(allMonsters[r][c].isDeleted == true ) {
         continue;
       }
-      if(allMonsters[r][c].xCoord >= 70 ) {
+      if(allMonsters[r][c].xCoord >= gridXLimit - sideOfMonster) {
         monstersMovingDirection = 'L';
         lowerMonsters();
         return;
@@ -356,6 +360,7 @@ void lowerMonsters() {
         //loser print
         return;
       }
+
       allMonsters[r][c].yCoord -= 1;
     }
   }

@@ -7,23 +7,22 @@
 void drawSquare(int x, int y, int width, int height, int colour) {
   ER5517.DrawSquare_Fill(x, y, 
                          width + x, 
-                         height + y, 
+                         y + height, 
                          colour
                          );
 }
 
 int adjustCoordX(float oldXCoord) {
-  float newXCoord = (oldXCoord / gridXLimit * LCD_XSIZE_TFT);
+  float newXCoord = (oldXCoord * LCD_XSIZE_TFT / gridXLimit);
   return newXCoord;
 }
 
 int adjustCoordY(float oldYCoord) {
-  float newYCoord = LCD_YSIZE_TFT - (oldYCoord / gridYLimit * LCD_YSIZE_TFT);
+  float newYCoord = LCD_YSIZE_TFT - (oldYCoord * LCD_YSIZE_TFT / gridYLimit);
   return newYCoord;
 }
 
 void drawFigure(int x, int y, int width, int height, int colour) {
-  //delay(500);
   drawSquare(
     adjustCoordX(x),
     adjustCoordY(y),
