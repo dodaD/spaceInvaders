@@ -4,6 +4,13 @@
 #include "Constants.h"
 #include "ScreenDriver.h"
 
+//#define LCD_XSIZE_TFT    800
+// #define LCD_YSIZE_TFT    480
+
+int screenHeight = LCD_YSIZE_TFT; 
+int screenWidth = LCD_XSIZE_TFT;
+int multiplier = 6;
+
 void drawSquare(int x, int y, int width, int height, int colour) {
   ER5517.DrawSquare_Fill(x, y, 
                          width + x, 
@@ -13,12 +20,12 @@ void drawSquare(int x, int y, int width, int height, int colour) {
 }
 
 int adjustCoordX(float oldXCoord) {
-  float newXCoord = (oldXCoord * LCD_XSIZE_TFT / gridXLimit);
+  float newXCoord = oldXCoord * multiplier;
   return newXCoord;
 }
 
 int adjustCoordY(float oldYCoord) {
-  float newYCoord = LCD_YSIZE_TFT - (oldYCoord * LCD_YSIZE_TFT / gridYLimit);
+  float newYCoord = screenHeight - oldYCoord * multiplier;
   return newYCoord;
 }
 
@@ -26,8 +33,8 @@ void drawFigure(int x, int y, int width, int height, int colour) {
   drawSquare(
     adjustCoordX(x),
     adjustCoordY(y),
-    width * LCD_XSIZE_TFT / gridXLimit,
-    height * LCD_XSIZE_TFT / gridYLimit,
+    width * multiplier,
+    height * multiplier,
     colour
   );
 }

@@ -4,20 +4,18 @@
 #define heightOfBullet 3 // TODO rename to something that makes sense 
 #define widthOfBullet 1
 #define sideOfMonster 5
-#define gridYLimit 100
-#define gridXLimit 70
+#define gridYLimit 80
+#define gridXLimit 80
 #define moveDistanceForMonsters 1
 #define moveDistanceForShip 2
 #define intervalForInvulnerability 2000UL
 #define intervalForSpeedingUp 30000UL
 #define rows 1
 #define columns 3
-#define shipWidth 6
-#define shipHeight 7
-#define screenHeight 800
-#define screenWidth 4003
+#define shipWidth 7
+#define shipHeight 3
 #define startPositionX 30
-#define startPositionY 80
+#define startPositionY 60
 #define moveDistanceForMonsters 1
 
 #endif

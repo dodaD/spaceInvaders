@@ -5,7 +5,7 @@
 unsigned long previousMillisForMoving = 0UL;
 unsigned long previousMillisForInvulnerability = 0UL;
 unsigned long previousMillisForSpeedingUp = 0UL;
-unsigned long interval = 500UL;
+unsigned long interval = 0UL;
 
 typedef struct {
   int xCoord;
@@ -67,15 +67,18 @@ void setup() {
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   createMonsters();
   createBulletsForMonsters();
-  //checkCollisionWithMonsters();
 }
 
 void loop() {
+  if(gamesStats.lifes == 0) {
+    //loser print
+    return;
+  }
   drawShip(White);
   shootFromShip();
   moveShipBullets();
-  checkCollisionWithMonsters();
-  checkCollisionWithShip();
+  //checkCollisionWithMonsters();
+  //checkCollisionWithShip();
   moveMonsters();
   monsterShoot();
 }
@@ -91,6 +94,22 @@ void drawMonster(int r, int c, int colour) {
 }
 
 void drawShip(int colour) {
+  if(spaceShip.isInvulnerable) {
+    drawFigure(spaceShip.xCoord, 
+    spaceShip.yCoord,
+    shipWidth, 
+    shipHeight, 
+    Blue
+    );
+    delay(25);
+    drawFigure(spaceShip.xCoord, 
+    spaceShip.yCoord,
+    shipWidth, 
+    shipHeight, 
+    Black
+    );
+    return;
+  }
   drawFigure(spaceShip.xCoord, 
       spaceShip.yCoord,
       shipWidth, 
@@ -124,7 +143,7 @@ void shootFromShip() {
   drawShipBullet(Black);
   spaceShipBullet.isReadyToShoot = false;
   spaceShipBullet.xCoord = spaceShip.xCoord + shipWidth / 2;
-  spaceShipBullet.yCoord = spaceShip.yCoord;
+  spaceShipBullet.yCoord = spaceShip.yCoord + 2; // TODO:
 }
 
 void moveShipBullets() {
@@ -198,6 +217,7 @@ void moveMonsters() {
   }
   if(intervalForSpeedingUp <
     currentMillis - previousMillisForSpeedingUp
+    && interval > 10UL
     ) {
     interval -= 10UL;
     previousMillisForSpeedingUp = currentMillis;
@@ -235,8 +255,7 @@ void monsterShoot() {
       allBullets[b].isReadyToShoot = false;
       Monster randomMonster = getRandomMonster();
       allBullets[b].xCoord = randomMonster.xCoord + sideOfMonster / 2;
-      allBullets[b].yCoord = randomMonster.yCoord - sideOfMonster - 5;
-      // TODO: polagodyty ce po narmolnomu
+      allBullets[b].yCoord = randomMonster.yCoord - sideOfMonster;
       continue;
     }
     drawMonstersBullet(b, Black);
@@ -255,7 +274,8 @@ void monsterShoot() {
 Monster getRandomMonster() {
   int column = rand() % columns;
   int row = rand() % rows;
-  if(allMonsters[row][column].isDeleted) {
+  if(allMonsters[row][column].isDeleted
+    ) {
     return getRandomMonster();
   }
   return allMonsters[row][column];
@@ -333,8 +353,8 @@ void lowerMonsters() {
         continue;
       }
 
-      if(allMonsters[r][c].yCoord <= 0) {
-        //loser print
+      if(allMonsters[r][c].yCoord - sideOfMonster <= spaceShip.yCoord + 1) {
+        gamesStats.lifes = 0;
         return;
       }
       drawMonster(r, c, Black);

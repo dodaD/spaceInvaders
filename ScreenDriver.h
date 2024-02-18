@@ -2,7 +2,7 @@
 #define ER5517_h
 #include "Arduino.h"
 #include <avr/pgmspace.h>
-#include <SPI.h>
+# include <SPI.h>
 
 #define Arduino_SPI     1 //1:use SPI to drive
 
