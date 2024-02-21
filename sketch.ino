@@ -5,7 +5,11 @@
 unsigned long previousMillisForMoving = 0UL;
 unsigned long previousMillisForInvulnerability = 0UL;
 unsigned long previousMillisForSpeedingUp = 0UL;
-unsigned long interval = 0UL;
+unsigned long previousMillisForShooting = 0UL;
+unsigned long previousMillisForMovingBullets = 0UL;
+unsigned long previousMillisForMovingShipBullet = 0UL;
+unsigned long interval = 200UL;
+unsigned long intervalForShooting = random(1000UL, 1500UL);
 
 typedef struct {
   int xCoord;
@@ -15,6 +19,7 @@ typedef struct {
 Ship spaceShip = {60, 20, false};
 
 int monstersColumns[columns];
+int monstersRows[rows];
 char monstersMovingDirection = 'R';
 typedef struct {
   int xCoord;
@@ -77,10 +82,12 @@ void loop() {
   drawShip(White);
   shootFromShip();
   moveShipBullets();
-  //checkCollisionWithMonsters();
-  //checkCollisionWithShip();
+  checkCollisionWithMonsters();
+  checkCollisionWithShip();
   moveMonsters();
+  monstersBulletsMove();
   monsterShoot();
+  moveShip('L');
 }
 
 void drawMonster(int r, int c, int colour) {
@@ -147,6 +154,13 @@ void shootFromShip() {
 }
 
 void moveShipBullets() {
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillisForMovingShipBullet
+    < intervalForMovingBullets) {
+    return;
+  }
+  previousMillisForMovingShipBullet = currentMillis;
+
     if(!spaceShipBullet.isReadyToShoot) {
       drawShipBullet(Black);
       if(spaceShipBullet.yCoord >= gridYLimit) {
@@ -194,17 +208,26 @@ void moveShip(char direction) {
 }
 
 void createMonsters() {
-  int columnGap = 1;
-  int rowGap = 2;
   for (int r = 0; r < rows; r++) {
+    monstersRows[r] = columns;
     for (int c = 0; c < columns; c++) {
-      monstersColumns[c] = rows; //TODO: ask if I should keep it here
-      allMonsters[r][c].xCoord = startPositionX +
-                                        c * sideOfMonster + 
-                                        columnGap * c;
-      allMonsters[r][c].yCoord = startPositionY +
-                                        r * sideOfMonster + 
-                                        rowGap * r;
+      monstersColumns[c] = rows;
+      int positionX = startPositionX + c * sideOfMonster + columnGap * c;
+      int positionY = startPositionY + r * sideOfMonster + rowGap * r;
+      if (positionX > gridXLimit) {
+        monstersRows[r] -= 1;
+        monstersColumns[c] = 0;
+        allMonsters[r][c].isDeleted = true;
+        continue;
+      }else if(positionY > gridYLimit) {
+        monstersColumns[c] -= 1;
+        monstersRows[r]  = 0;
+        allMonsters[r][c].isDeleted = true;
+        continue;
+      }
+
+      allMonsters[r][c].xCoord = positionX;
+      allMonsters[r][c].yCoord = positionY;
       allMonsters[r][c].isDeleted = false;
     }
   }
@@ -227,7 +250,7 @@ void moveMonsters() {
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
       if(allMonsters[r][c].isDeleted) {
-      return;
+        continue;
       }
       drawMonster(r, c, Black);
       if (monstersMovingDirection == 'L') {
@@ -249,7 +272,12 @@ void createBulletsForMonsters() {
 }
  
 void monsterShoot() {
-  delay(25);//just for demonstrationdrawMonstersBullets
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillisForShooting < intervalForShooting) {
+    return;
+  }
+  intervalForShooting = random(1000UL, 1500UL);
+  previousMillisForShooting = currentMillis;
   for(int b = 0; b < maxBullets; b++) {
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
       allBullets[b].isReadyToShoot = false;
@@ -258,6 +286,18 @@ void monsterShoot() {
       allBullets[b].yCoord = randomMonster.yCoord - sideOfMonster;
       continue;
     }
+  }
+}
+
+void monstersBulletsMove() {
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillisForMovingBullets
+    < intervalForMovingBullets) {
+    return;
+  }
+  previousMillisForMovingBullets = currentMillis;
+
+  for(int b = 0; b < maxBullets; b++) {  
     drawMonstersBullet(b, Black);
     if(allBullets[b].isReadyToShoot) {
       continue;

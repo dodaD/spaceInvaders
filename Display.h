@@ -31,8 +31,8 @@ int adjustCoordY(float oldYCoord) {
 
 void drawFigure(int x, int y, int width, int height, int colour) {
   drawSquare(
-    adjustCoordX(x),
-    adjustCoordY(y),
+    adjustCoordX(x + 1),
+    adjustCoordY(y - 1),
     width * multiplier,
     height * multiplier,
     colour

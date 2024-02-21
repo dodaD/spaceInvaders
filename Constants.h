@@ -10,12 +10,15 @@
 #define moveDistanceForShip 2
 #define intervalForInvulnerability 2000UL
 #define intervalForSpeedingUp 30000UL
-#define rows 1
-#define columns 3
+#define intervalForMovingBullets 50UL
+#define rows 2
+#define columns 16
 #define shipWidth 7
 #define shipHeight 3
 #define startPositionX 30
 #define startPositionY 60
 #define moveDistanceForMonsters 1
+#define columnGap 5
+#define rowGap 2
 
 #endif
