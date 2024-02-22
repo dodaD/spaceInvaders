@@ -189,6 +189,7 @@ void checkCollisionWithMonsters() {
         spaceShipBullet.isReadyToShoot = true;
         drawMonster(r, c, Black);
         allMonsters[r][c].isDeleted = true;
+        monstersColumns[c] -= 1;
         return;
       }
     }
@@ -316,9 +317,12 @@ void shootRandomly(int b) {
     return shootRandomly(b);
   }
   allBullets[b].xCoord = allMonsters[row][column].xCoord + sideOfMonster / 2;
-  int distanceToTravel = (monstersColumns[column] - row) == 0 
-    ? columns - 1 
-    : monstersColumns[column] - row;
+  int distanceToTravel = monstersColumns[column] - row; 
+  if(monstersColumns[column] == 1) {
+    distanceToTravel = 1;
+  } else if (monstersColumns[column] - row == 0 ) {
+    distanceToTravel = columns - 1;
+  }
   allBullets[b].yCoord =  allMonsters[row][column].yCoord - 
     rowGap * distanceToTravel - 
     distanceToTravel 
