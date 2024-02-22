@@ -19,7 +19,6 @@ typedef struct {
 Ship spaceShip = {60, 20, false};
 
 int monstersColumns[columns];
-int monstersRows[rows];
 char monstersMovingDirection = 'R';
 typedef struct {
   int xCoord;
@@ -79,7 +78,6 @@ void loop() {
     //loser print
     return;
   }
-  drawShip(White);
   shootFromShip();
   moveShipBullets();
   checkCollisionWithMonsters();
@@ -108,7 +106,7 @@ void drawShip(int colour) {
     shipHeight, 
     Blue
     );
-    delay(25);
+    //delay(25);
     drawFigure(spaceShip.xCoord, 
     spaceShip.yCoord,
     shipWidth, 
@@ -150,7 +148,7 @@ void shootFromShip() {
   drawShipBullet(Black);
   spaceShipBullet.isReadyToShoot = false;
   spaceShipBullet.xCoord = spaceShip.xCoord + shipWidth / 2;
-  spaceShipBullet.yCoord = spaceShip.yCoord + 2; // TODO:
+  spaceShipBullet.yCoord = spaceShip.yCoord + 5; // TODO:
 }
 
 void moveShipBullets() {
@@ -198,10 +196,15 @@ void checkCollisionWithMonsters() {
 }
 
 void moveShip(char direction) {
+  if(spaceShip.xCoord > gridXLimit - shipWidth 
+      || spaceShip.xCoord < moveDistanceForShip) {
+    return;
+  }
+  delay(10);
   drawShip(Black);
-  if (direction == 'R' && spaceShip.xCoord < gridXLimit - shipWidth) {
+  if (direction == 'R') {
     spaceShip.xCoord += moveDistanceForShip;
-  } else if(spaceShip.xCoord > moveDistanceForShip && direction == 'L') {
+  } else if(direction == 'L') {
     spaceShip.xCoord -= moveDistanceForShip;
   }
   drawShip(White);
@@ -209,19 +212,16 @@ void moveShip(char direction) {
 
 void createMonsters() {
   for (int r = 0; r < rows; r++) {
-    monstersRows[r] = columns;
     for (int c = 0; c < columns; c++) {
       monstersColumns[c] = rows;
       int positionX = startPositionX + c * sideOfMonster + columnGap * c;
-      int positionY = startPositionY + r * sideOfMonster + rowGap * r;
+      int positionY = startPositionY - r * sideOfMonster - rowGap * r;
       if (positionX > gridXLimit) {
-        monstersRows[r] -= 1;
         monstersColumns[c] = 0;
         allMonsters[r][c].isDeleted = true;
         continue;
       }else if(positionY > gridYLimit) {
         monstersColumns[c] -= 1;
-        monstersRows[r]  = 0;
         allMonsters[r][c].isDeleted = true;
         continue;
       }
@@ -281,9 +281,7 @@ void monsterShoot() {
   for(int b = 0; b < maxBullets; b++) {
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
       allBullets[b].isReadyToShoot = false;
-      Monster randomMonster = getRandomMonster();
-      allBullets[b].xCoord = randomMonster.xCoord + sideOfMonster / 2;
-      allBullets[b].yCoord = randomMonster.yCoord - sideOfMonster;
+      shootRandomly(b);
       continue;
     }
   }
@@ -311,14 +309,20 @@ void monstersBulletsMove() {
   }
 }
 
-Monster getRandomMonster() {
+void shootRandomly(int b) {
   int column = rand() % columns;
   int row = rand() % rows;
-  if(allMonsters[row][column].isDeleted
-    ) {
-    return getRandomMonster();
+  if(allMonsters[row][column].isDeleted) {
+    return shootRandomly(b);
   }
-  return allMonsters[row][column];
+  allBullets[b].xCoord = allMonsters[row][column].xCoord + sideOfMonster / 2;
+  int distanceToTravel = (monstersColumns[column] - row) == 0 
+    ? columns - 1 
+    : monstersColumns[column] - row;
+  allBullets[b].yCoord =  allMonsters[row][column].yCoord - 
+    rowGap * distanceToTravel - 
+    distanceToTravel 
+    * sideOfMonster;
 }
 
 void checkCollisionWithShip() {
