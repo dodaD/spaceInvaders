@@ -9,14 +9,14 @@ unsigned long previousMillisForShooting = 0UL;
 unsigned long previousMillisForMovingBullets = 0UL;
 unsigned long previousMillisForMovingShipBullet = 0UL;
 unsigned long interval = 200UL;
-unsigned long intervalForShooting = random(1000UL, 1500UL);
+unsigned long intervalForShooting = random(500UL, 1000UL);
 
 typedef struct {
   int xCoord;
   int yCoord;
   bool isInvulnerable;
 }Ship;
-Ship spaceShip = {60, 20, false};
+Ship spaceShip = {30, 20, false};
 
 int monstersColumns[columns];
 char monstersMovingDirection = 'R';
@@ -40,7 +40,7 @@ typedef struct {
 
 Stats gamesStats= {0, 3};
 
-Bullet spaceShipBullet = {0, 0, true}; 
+Bullet spaceShipBullet = {34, 0, false}; 
 const int maxBullets = 7 > columns * rows ? columns * rows : 7;
 Bullet allBullets[maxBullets];
 
@@ -71,9 +71,11 @@ void setup() {
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   createMonsters();
   createBulletsForMonsters();
+  //drawGrid();
 }
 
 void loop() {
+  drawGrid();
   if(gamesStats.lifes == 0) {
     //loser print
     return;
@@ -85,7 +87,8 @@ void loop() {
   moveMonsters();
   monstersBulletsMove();
   monsterShoot();
-  moveShip('L');
+  drawShip(White);
+  //moveShip('R');
 }
 
 void drawMonster(int r, int c, int colour) {
@@ -101,22 +104,15 @@ void drawMonster(int r, int c, int colour) {
 void drawShip(int colour) {
   if(spaceShip.isInvulnerable) {
     drawFigure(spaceShip.xCoord, 
-    spaceShip.yCoord,
-    shipWidth, 
-    shipHeight, 
-    Blue
-    );
-    //delay(25);
-    drawFigure(spaceShip.xCoord, 
-    spaceShip.yCoord,
-    shipWidth, 
-    shipHeight, 
-    Black
+      spaceShip.yCoord + 1,
+      shipWidth, 
+      shipHeight, 
+      colour == White ? Blue : Black 
     );
     return;
   }
   drawFigure(spaceShip.xCoord, 
-      spaceShip.yCoord,
+      spaceShip.yCoord + 1,
       shipWidth, 
       shipHeight, 
       colour
@@ -152,6 +148,9 @@ void shootFromShip() {
 }
 
 void moveShipBullets() {
+  if(spaceShipBullet.isReadyToShoot) {
+    return;
+  }
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForMovingShipBullet
     < intervalForMovingBullets) {
@@ -182,12 +181,15 @@ void checkCollisionWithMonsters() {
         continue;
       }
       if (allMonsters[r][c].yCoord >= spaceShipBullet.yCoord - heightOfBullet
-          && allMonsters[r][c].yCoord-sideOfMonster <= spaceShipBullet.yCoord
-          && allMonsters[r][c].xCoord <= spaceShipBullet.xCoord+widthOfBullet
-          && allMonsters[r][c].xCoord+sideOfMonster >= spaceShipBullet.xCoord
+          && allMonsters[r][c].yCoord - sideOfMonster 
+          <= spaceShipBullet.yCoord
+          && allMonsters[r][c].xCoord 
+          <= spaceShipBullet.xCoord + widthOfBullet - 1
+          && allMonsters[r][c].xCoord + sideOfMonster - 1 
+          >= spaceShipBullet.xCoord
          ){
         spaceShipBullet.isReadyToShoot = true;
-        drawMonster(r, c, Black);
+        drawMonster(r, c, Yellow);
         allMonsters[r][c].isDeleted = true;
         monstersColumns[c] -= 1;
         return;
@@ -197,8 +199,8 @@ void checkCollisionWithMonsters() {
 }
 
 void moveShip(char direction) {
-  if(spaceShip.xCoord > gridXLimit - shipWidth 
-      || spaceShip.xCoord < moveDistanceForShip) {
+  if(spaceShip.xCoord > gridXLimit - shipWidth && direction == 'R'
+      || spaceShip.xCoord <= 0 && direction == 'L') {
     return;
   }
   delay(10);
@@ -217,11 +219,11 @@ void createMonsters() {
       monstersColumns[c] = rows;
       int positionX = startPositionX + c * sideOfMonster + columnGap * c;
       int positionY = startPositionY - r * sideOfMonster - rowGap * r;
-      if (positionX > gridXLimit) {
+      if (positionX > gridXLimit - sideOfMonster - columnGap) {
         monstersColumns[c] = 0;
         allMonsters[r][c].isDeleted = true;
         continue;
-      }else if(positionY > gridYLimit) {
+      }else if(positionY > gridYLimit - sideOfMonster - rowGap) {
         monstersColumns[c] -= 1;
         allMonsters[r][c].isDeleted = true;
         continue;
@@ -335,20 +337,22 @@ void checkCollisionWithShip() {
       currentMillis - previousMillisForInvulnerability 
       > intervalForInvulnerability) {
       spaceShip.isInvulnerable = false;
-  } else if (spaceShip.isInvulnerable){
-    return;
   }
 
   for (int b = 0; b < maxBullets; b++) {
     if (allBullets[b].isReadyToShoot) {
       continue;
     }
-
-    if (allBullets[b].xCoord + widthOfBullet >= spaceShip.xCoord &&
-        allBullets[b].xCoord <= spaceShip.xCoord + shipWidth &&
+    if (allBullets[b].xCoord + widthOfBullet - 1 >= spaceShip.xCoord &&
+        allBullets[b].xCoord <= spaceShip.xCoord + shipWidth - 1 &&
         allBullets[b].yCoord >= spaceShip.yCoord - shipHeight &&
         allBullets[b].yCoord - heightOfBullet <= spaceShip.yCoord
-      ){
+       ){
+      if (spaceShip.isInvulnerable) {
+        drawMonstersBullet(b, Black);
+        allBullets[b].isReadyToShoot = true;
+        return;
+      }
       drawMonstersBullet(b, Black);
       allBullets[b].isReadyToShoot = true;
       gamesStats.lifes -= 1;

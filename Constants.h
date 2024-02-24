@@ -8,11 +8,11 @@
 #define gridXLimit 80
 #define moveDistanceForMonsters 1
 #define moveDistanceForShip 2
-#define intervalForInvulnerability 2000UL
+#define intervalForInvulnerability 50000UL
 #define intervalForSpeedingUp 30000UL
 #define intervalForMovingBullets 50UL
 #define rows 3
-#define columns 16
+#define columns 3
 #define shipWidth 7
 #define shipHeight 3
 #define startPositionX 30
