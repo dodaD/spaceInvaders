@@ -40,7 +40,7 @@ typedef struct {
 
 Stats gamesStats= {0, 3};
 
-Bullet spaceShipBullet = {34, 0, false}; 
+Bullet spaceShipBullet = {0, 0, true}; 
 const int maxBullets = 7 > columns * rows ? columns * rows : 7;
 Bullet allBullets[maxBullets];
 
@@ -82,8 +82,8 @@ void loop() {
   }
   shootFromShip();
   moveShipBullets();
-  checkCollisionWithMonsters();
-  checkCollisionWithShip();
+  //checkCollisionWithMonsters();
+  //checkCollisionWithShip();
   moveMonsters();
   monstersBulletsMove();
   monsterShoot();
@@ -189,7 +189,7 @@ void checkCollisionWithMonsters() {
           >= spaceShipBullet.xCoord
          ){
         spaceShipBullet.isReadyToShoot = true;
-        drawMonster(r, c, Yellow);
+        drawMonster(r, c, Black);
         allMonsters[r][c].isDeleted = true;
         monstersColumns[c] -= 1;
         return;
@@ -219,11 +219,12 @@ void createMonsters() {
       monstersColumns[c] = rows;
       int positionX = startPositionX + c * sideOfMonster + columnGap * c;
       int positionY = startPositionY - r * sideOfMonster - rowGap * r;
+
       if (positionX > gridXLimit - sideOfMonster - columnGap) {
         monstersColumns[c] = 0;
         allMonsters[r][c].isDeleted = true;
         continue;
-      }else if(positionY > gridYLimit - sideOfMonster - rowGap) {
+      }else if(positionY < spaceShip.yCoord + sideOfMonster + rowGap) {
         monstersColumns[c] -= 1;
         allMonsters[r][c].isDeleted = true;
         continue;
@@ -373,7 +374,7 @@ void monstersChangeDirection() {
       if(allMonsters[r][c].isDeleted == true ) {
         continue;
       }
-      if(allMonsters[r][c].xCoord >= gridXLimit - sideOfMonster) {
+      if(allMonsters[r][c].xCoord >= gridXLimit - sideOfMonster + 1) {
         monstersMovingDirection = 'L';
         lowerMonsters();
         return;
@@ -389,7 +390,7 @@ void monstersChangeDirection() {
       if(allMonsters[r][c].isDeleted == true ) {
         continue;
       }
-      if(allMonsters[r][c].xCoord <= 0 ) {
+      if(allMonsters[r][c].xCoord < moveDistanceForMonsters ) {
         monstersMovingDirection = 'R';
         lowerMonsters(); 
         return;
