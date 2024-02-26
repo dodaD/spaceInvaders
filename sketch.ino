@@ -8,8 +8,9 @@ unsigned long previousMillisForSpeedingUp = 0UL;
 unsigned long previousMillisForShooting = 0UL;
 unsigned long previousMillisForMovingBullets = 0UL;
 unsigned long previousMillisForMovingShipBullet = 0UL;
-unsigned long interval = 200UL;
+unsigned long interval = 2000UL;
 unsigned long intervalForShooting = random(500UL, 1000UL);
+int columnsDestroyed = 0;
 
 typedef struct {
   int xCoord;
@@ -78,6 +79,11 @@ void loop() {
   drawGrid();
   if(gamesStats.lifes == 0) {
     //loser print
+    return;
+  }
+  if(columnsDestroyed == columns) {
+    //winner print
+    Serial.println("no way");
     return;
   }
   shootFromShip();
@@ -193,6 +199,9 @@ void checkCollisionWithMonsters() {
         drawMonster(r, c, Black);
         allMonsters[r][c].isDeleted = true;
         monstersColumns[c] -= 1;
+        if (monstersColumns[c] == 0) {
+          columnsDestroyed += 1;
+        }
         return;
       }
     }
@@ -227,6 +236,7 @@ void createMonsters() {
       if (positionX > gridXLimit - sideOfMonster - columnGap) {
         monstersColumns[c] = 0;
         allMonsters[r][c].isDeleted = true;
+        columnsDestroyed += 1;
         continue;
       }else if(positionY < spaceShip.yCoord + sideOfMonster + rowGap) {
         monstersColumns[c] -= 1;
@@ -237,6 +247,7 @@ void createMonsters() {
       allMonsters[r][c].xCoord = positionX;
       allMonsters[r][c].yCoord = positionY;
       allMonsters[r][c].isDeleted = false;
+      drawMonster(r, c, White);
     }
   }
 }
@@ -249,9 +260,9 @@ void moveMonsters() {
   }
   if(intervalForSpeedingUp <
     currentMillis - previousMillisForSpeedingUp
-    && interval > 10UL
+    && interval >= 50UL
     ) {
-    interval -= 10UL;
+    interval -= 50UL;
     previousMillisForSpeedingUp = currentMillis;
   }
 
