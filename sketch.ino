@@ -82,13 +82,14 @@ void loop() {
   }
   shootFromShip();
   moveShipBullets();
-  //checkCollisionWithMonsters();
-  //checkCollisionWithShip();
+  checkCollisionWithMonsters();
+  checkCollisionWithShip();
   moveMonsters();
   monstersBulletsMove();
-  monsterShoot();
+  monstersShoot();
+  monstersBulletsMove();
   drawShip(White);
-  //moveShip('R');
+  moveShip('R');
 }
 
 void drawMonster(int r, int c, int colour) {
@@ -214,9 +215,12 @@ void moveShip(char direction) {
 }
 
 void createMonsters() {
+  for (int c = 0; c < columns; c++) {
+    monstersColumns[c] = rows;
+  }
+
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
-      monstersColumns[c] = rows;
       int positionX = startPositionX + c * sideOfMonster + columnGap * c;
       int positionY = startPositionY - r * sideOfMonster - rowGap * r;
 
@@ -238,6 +242,7 @@ void createMonsters() {
 }
 
 void moveMonsters() {
+  monstersChangeDirection();
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForMoving < interval) {
     return;
@@ -249,7 +254,6 @@ void moveMonsters() {
     interval -= 10UL;
     previousMillisForSpeedingUp = currentMillis;
   }
-  monstersChangeDirection();
 
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
@@ -275,7 +279,7 @@ void createBulletsForMonsters() {
   }
 }
  
-void monsterShoot() {
+void monstersShoot() {
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForShooting < intervalForShooting) {
     return;
@@ -289,6 +293,25 @@ void monsterShoot() {
       continue;
     }
   }
+}
+
+void shootRandomly(int b) {
+  int column = rand() % columns;
+  int row = 0;
+  for ( int r = rows - 1; r >= 0; r-- ) {
+    if(allMonsters[r][column].isDeleted == false) {
+      row = r;
+      break;
+    }
+  }
+  if(allMonsters[row][column].isDeleted) {
+    return shootRandomly(b);
+  }
+
+  allBullets[b].xCoord = allMonsters[row][column].xCoord + sideOfMonster / 2;
+  allBullets[b].yCoord =  allMonsters[row][column].yCoord 
+    - sideOfMonster 
+    - rowGap;
 }
 
 void monstersBulletsMove() {
@@ -311,25 +334,6 @@ void monstersBulletsMove() {
     allBullets[b].yCoord -= 1;
     drawMonstersBullet(b, Green);
   }
-}
-
-void shootRandomly(int b) {
-  int column = rand() % columns;
-  int row = rand() % rows;
-  if(allMonsters[row][column].isDeleted) {
-    return shootRandomly(b);
-  }
-  allBullets[b].xCoord = allMonsters[row][column].xCoord + sideOfMonster / 2;
-  int distanceToTravel = monstersColumns[column] - row; 
-  if(monstersColumns[column] == 1) {
-    distanceToTravel = 1;
-  } else if (monstersColumns[column] - row == 0 ) {
-    distanceToTravel = columns - 1;
-  }
-  allBullets[b].yCoord =  allMonsters[row][column].yCoord - 
-    rowGap * distanceToTravel - 
-    distanceToTravel 
-    * sideOfMonster;
 }
 
 void checkCollisionWithShip() {
@@ -410,7 +414,13 @@ void lowerMonsters() {
         gamesStats.lifes = 0;
         return;
       }
-      drawMonster(r, c, Black);
+      drawFigure(
+          allMonsters[r][c].xCoord,
+          allMonsters[r][c].yCoord,
+          sideOfMonster,
+          1,
+          Black
+          );
       allMonsters[r][c].yCoord -= 1;
     }
   }

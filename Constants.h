@@ -11,8 +11,8 @@
 #define intervalForInvulnerability 50000UL
 #define intervalForSpeedingUp 30000UL
 #define intervalForMovingBullets 50UL
-#define rows 17
-#define columns 3
+#define rows 7
+#define columns 13
 #define shipWidth 7
 #define shipHeight 3
 #define startPositionX 30
