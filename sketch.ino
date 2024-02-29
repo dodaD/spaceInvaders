@@ -17,7 +17,7 @@ typedef struct {
   int yCoord;
   bool isInvulnerable;
 }Ship;
-Ship spaceShip = {70, 20, false};
+Ship spaceShip = {gridXLimit / 2, spaceShipY, false};
 
 int monstersColumns[columns];
 char monstersMovingDirection = 'R';
@@ -93,7 +93,6 @@ void loop() {
   moveMonsters();
   monstersBulletsMove();
   monstersShoot();
-  monstersBulletsMove();
   drawShip(White);
   //moveShip('L');
 }
@@ -309,8 +308,7 @@ void shootRandomly(int b) {
   }
 
   allBullets[b].xCoord = allMonsters[row][column].xCoord + sideOfMonster / 2;
-  allBullets[b].yCoord =  allMonsters[row][column].yCoord 
-    - sideOfMonster;
+  allBullets[b].yCoord =  allMonsters[row][column].yCoord - sideOfMonster;
 }
 
 void monstersBulletsMove() {

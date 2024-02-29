@@ -13,8 +13,8 @@ int multiplier = 6;
 
 void drawSquare(int x, int y, int width, int height, int colour) {
   ER5517.DrawSquare_Fill(x, y, 
-                         width + x, 
-                         y + height, 
+                         width + x - 1, 
+                         y + height - 1, 
                          colour
                          );
 }
