@@ -40,7 +40,7 @@ void drawFigure(int x, int y, int width, int height, int colour) {
 }
 
 void drawGrid() {
-  for(int w = 0; w < gridXLimit * multiplier; w += multiplier) {
+  for(int w = 0; w <= gridXLimit * multiplier; w += multiplier) {
     drawSquare(w, 0, 1, gridYLimit * multiplier, White);
   }
   for(int h = 0; h < gridYLimit * multiplier; h += multiplier) {

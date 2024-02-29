@@ -17,7 +17,7 @@ typedef struct {
   int yCoord;
   bool isInvulnerable;
 }Ship;
-Ship spaceShip = {30, 20, false};
+Ship spaceShip = {70, 20, false};
 
 int monstersColumns[columns];
 char monstersMovingDirection = 'R';
@@ -76,7 +76,7 @@ void setup() {
 }
 
 void loop() {
-  drawGrid();
+  //drawGrid();
   if(gamesStats.lifes == 0) {
     //loser print
     return;
@@ -88,14 +88,14 @@ void loop() {
   }
   shootFromShip();
   moveShipBullets();
-  checkCollisionWithMonsters();
-  checkCollisionWithShip();
+  //checkCollisionWithMonsters();
+  //checkCollisionWithShip();
   moveMonsters();
   monstersBulletsMove();
   monstersShoot();
   monstersBulletsMove();
   drawShip(White);
-  moveShip('R');
+  //moveShip('L');
 }
 
 void drawMonster(int r, int c, int colour) {
@@ -150,7 +150,7 @@ void shootFromShip() {
   }
   drawShipBullet(Black);
   spaceShipBullet.isReadyToShoot = false;
-  spaceShipBullet.xCoord = spaceShip.xCoord + shipWidth / 2;
+  spaceShipBullet.xCoord = spaceShip.xCoord + 1 + shipWidth / 2;
   spaceShipBullet.yCoord = spaceShip.yCoord + 5; // TODO:
 }
 
@@ -233,17 +233,6 @@ void createMonsters() {
       int positionX = startPositionX + c * sideOfMonster + columnGap * c;
       int positionY = startPositionY - r * sideOfMonster - rowGap * r;
 
-      if (positionX > gridXLimit - sideOfMonster - columnGap) {
-        monstersColumns[c] = 0;
-        allMonsters[r][c].isDeleted = true;
-        columnsDestroyed += 1;
-        continue;
-      }else if(positionY < spaceShip.yCoord + sideOfMonster + rowGap) {
-        monstersColumns[c] -= 1;
-        allMonsters[r][c].isDeleted = true;
-        continue;
-      }
-
       allMonsters[r][c].xCoord = positionX;
       allMonsters[r][c].yCoord = positionY;
       allMonsters[r][c].isDeleted = false;
@@ -260,9 +249,9 @@ void moveMonsters() {
   }
   if(intervalForSpeedingUp <
     currentMillis - previousMillisForSpeedingUp
-    && interval >= 50UL
+    && interval >= 10UL
     ) {
-    interval -= 50UL;
+    interval -= 10UL;
     previousMillisForSpeedingUp = currentMillis;
   }
 
@@ -295,7 +284,7 @@ void monstersShoot() {
   if(currentMillis - previousMillisForShooting < intervalForShooting) {
     return;
   }
-  intervalForShooting = random(1000UL, 1500UL);
+  intervalForShooting = random(500UL, 1000UL);
   previousMillisForShooting = currentMillis;
   for(int b = 0; b < maxBullets; b++) {
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
@@ -321,8 +310,7 @@ void shootRandomly(int b) {
 
   allBullets[b].xCoord = allMonsters[row][column].xCoord + sideOfMonster / 2;
   allBullets[b].yCoord =  allMonsters[row][column].yCoord 
-    - sideOfMonster 
-    - rowGap;
+    - sideOfMonster;
 }
 
 void monstersBulletsMove() {
