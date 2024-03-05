@@ -8,7 +8,7 @@ unsigned long previousMillisForSpeedingUp = 0UL;
 unsigned long previousMillisForShooting = 0UL;
 unsigned long previousMillisForMovingBullets = 0UL;
 unsigned long previousMillisForMovingShipBullet = 0UL;
-unsigned long interval = 2000UL;
+unsigned long interval = 200UL;
 unsigned long intervalForShooting = random(500UL, 1000UL);
 int columnsDestroyed = 0;
 
@@ -17,7 +17,7 @@ typedef struct {
   int yCoord;
   bool isInvulnerable;
 }Ship;
-Ship spaceShip = {gridXLimit / 2, spaceShipY, false};
+Ship spaceShip = {0, spaceShipY, false};
 
 int monstersColumns[columns];
 char monstersMovingDirection = 'R';
@@ -73,10 +73,11 @@ void setup() {
   createMonsters();
   createBulletsForMonsters();
   //drawGrid();
+  //Serial.println(startPositionX);
 }
 
 void loop() {
-  //drawGrid();
+  drawGrid();
   if(gamesStats.lifes == 0) {
     //loser print
     return;
@@ -87,10 +88,10 @@ void loop() {
     return;
   }
   shootFromShip();
-  moveShipBullets();
+  //moveShipBullets();
   //checkCollisionWithMonsters();
   //checkCollisionWithShip();
-  moveMonsters();
+  //moveMonsters();
   monstersBulletsMove();
   monstersShoot();
   drawShip(White);
@@ -110,7 +111,7 @@ void drawMonster(int r, int c, int colour) {
 void drawShip(int colour) {
   if(spaceShip.isInvulnerable) {
     drawFigure(spaceShip.xCoord, 
-      spaceShip.yCoord + 1,
+      spaceShip.yCoord - shipHeight,
       shipWidth, 
       shipHeight, 
       colour == White ? Blue : Black 
@@ -118,7 +119,7 @@ void drawShip(int colour) {
     return;
   }
   drawFigure(spaceShip.xCoord, 
-      spaceShip.yCoord + 1,
+      spaceShip.yCoord - shipHeight,
       shipWidth, 
       shipHeight, 
       colour
@@ -150,7 +151,8 @@ void shootFromShip() {
   drawShipBullet(Black);
   spaceShipBullet.isReadyToShoot = false;
   spaceShipBullet.xCoord = spaceShip.xCoord + 1 + shipWidth / 2;
-  spaceShipBullet.yCoord = spaceShip.yCoord + 5; // TODO:
+  spaceShipBullet.yCoord = spaceShip.yCoord + 1; // TODO:
+  drawShipBullet(Red);
 }
 
 void moveShipBullets() {
@@ -296,6 +298,8 @@ void monstersShoot() {
 
 void shootRandomly(int b) {
   int column = rand() % columns;
+  Serial.println("**********************");
+  Serial.println(column);
   int row = 0;
   for ( int r = rows - 1; r >= 0; r-- ) {
     if(allMonsters[r][column].isDeleted == false) {
