@@ -8,7 +8,8 @@ unsigned long previousMillisForSpeedingUp = 0UL;
 unsigned long previousMillisForShooting = 0UL;
 unsigned long previousMillisForMovingBullets = 0UL;
 unsigned long previousMillisForMovingShipBullet = 0UL;
-unsigned long interval = 200UL;
+unsigned long previousMillisForMovingShip = 0UL;
+unsigned long interval = 1000UL;
 unsigned long intervalForShooting = random(500UL, 1000UL);
 int columnsDestroyed = 0;
 
@@ -17,7 +18,7 @@ typedef struct {
   int yCoord;
   bool isInvulnerable;
 }Ship;
-Ship spaceShip = {0, spaceShipY, false};
+Ship spaceShip = {spaceShipX, spaceShipY, false};
 
 int monstersColumns[columns];
 char monstersMovingDirection = 'R';
@@ -77,7 +78,7 @@ void setup() {
 }
 
 void loop() {
-  drawGrid();
+  //drawGrid();
   if(gamesStats.lifes == 0) {
     //loser print
     return;
@@ -88,14 +89,16 @@ void loop() {
     return;
   }
   shootFromShip();
-  //moveShipBullets();
-  //checkCollisionWithMonsters();
-  //checkCollisionWithShip();
-  //moveMonsters();
+  moveShipBullets();
+  checkCollisionWithMonsters();
+  checkCollisionWithShip();
+  moveMonsters();
   monstersBulletsMove();
   monstersShoot();
-  drawShip(White);
-  //moveShip('L');
+
+  shootFromShip();
+  drawShip(White); 
+  moveShip('R');
 }
 
 void drawMonster(int r, int c, int colour) {
@@ -111,15 +114,15 @@ void drawMonster(int r, int c, int colour) {
 void drawShip(int colour) {
   if(spaceShip.isInvulnerable) {
     drawFigure(spaceShip.xCoord, 
-      spaceShip.yCoord - shipHeight,
+      spaceShip.yCoord,
       shipWidth, 
       shipHeight, 
-      colour == White ? Blue : Black 
+      colour == Black ? Black : Blue
     );
     return;
   }
   drawFigure(spaceShip.xCoord, 
-      spaceShip.yCoord - shipHeight,
+      spaceShip.yCoord,
       shipWidth, 
       shipHeight, 
       colour
@@ -150,8 +153,8 @@ void shootFromShip() {
   }
   drawShipBullet(Black);
   spaceShipBullet.isReadyToShoot = false;
-  spaceShipBullet.xCoord = spaceShip.xCoord + 1 + shipWidth / 2;
-  spaceShipBullet.yCoord = spaceShip.yCoord + 1; // TODO:
+  spaceShipBullet.xCoord = spaceShip.xCoord + shipWidth / 2;
+  spaceShipBullet.yCoord = spaceShip.yCoord + heightOfBullet; // TODO:
   drawShipBullet(Red);
 }
 
@@ -210,15 +213,22 @@ void checkCollisionWithMonsters() {
 }
 
 void moveShip(char direction) {
-  if(spaceShip.xCoord > gridXLimit - shipWidth && direction == 'R'
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillisForMovingShip < intervalForMovingShip) {
+    return;
+  }
+  previousMillisForMovingShip = currentMillis;
+
+  if (spaceShip.xCoord > gridXLimit - shipWidth - moveDistanceForShip
+      && direction == 'R'
       || spaceShip.xCoord <= 0 && direction == 'L') {
     return;
   }
-  delay(10);
   drawShip(Black);
+
   if (direction == 'R') {
     spaceShip.xCoord += moveDistanceForShip;
-  } else if(direction == 'L') {
+  } else if (direction == 'L') {
     spaceShip.xCoord -= moveDistanceForShip;
   }
   drawShip(White);
@@ -298,21 +308,21 @@ void monstersShoot() {
 
 void shootRandomly(int b) {
   int column = rand() % columns;
-  Serial.println("**********************");
-  Serial.println(column);
   int row = 0;
+  if(monstersColumns[column] == 0) {
+    return shootRandomly(b);
+  }
+
   for ( int r = rows - 1; r >= 0; r-- ) {
     if(allMonsters[r][column].isDeleted == false) {
       row = r;
       break;
     }
   }
-  if(allMonsters[row][column].isDeleted) {
-    return shootRandomly(b);
-  }
 
   allBullets[b].xCoord = allMonsters[row][column].xCoord + sideOfMonster / 2;
   allBullets[b].yCoord =  allMonsters[row][column].yCoord - sideOfMonster;
+  drawMonstersBullet(b, Green);
 }
 
 void monstersBulletsMove() {
@@ -371,7 +381,7 @@ void checkCollisionWithShip() {
 }
 
 void monstersChangeDirection() { 
-  for(int c = columns - 1; c > 0 && monstersMovingDirection == 'R'; c--) {
+  for(int c = columns - 1; c >= 0 && monstersMovingDirection == 'R'; c--) {
     if(monstersColumns[c] == 0) {
       continue;
     }
@@ -379,7 +389,7 @@ void monstersChangeDirection() {
       if(allMonsters[r][c].isDeleted == true ) {
         continue;
       }
-      if(allMonsters[r][c].xCoord >= gridXLimit - sideOfMonster + 1) {
+      if(allMonsters[r][c].xCoord >= gridXLimit - sideOfMonster) {
         monstersMovingDirection = 'L';
         lowerMonsters();
         return;
