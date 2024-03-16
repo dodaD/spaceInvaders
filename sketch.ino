@@ -41,12 +41,11 @@ typedef struct {
 }Stats;
 
 Stats gamesStats= {0, 3};
-
 Bullet spaceShipBullet = {0, 0, true}; 
 const int maxBullets = 7 > columns * rows ? columns * rows : 7;
 Bullet allBullets[maxBullets];
 
-void setup() {
+void setup() {  
   Serial.begin(9600);
   pinMode(5,   OUTPUT);
   digitalWrite(5, HIGH);//Disable  SD 
@@ -71,14 +70,24 @@ void setup() {
   ER5517.Active_Window_WH(LCD_XSIZE_TFT,LCD_YSIZE_TFT); 
 
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
-  createMonsters();
-  createBulletsForMonsters();
+  // createMonsters();
+  //createBulletsForMonsters();
   //drawGrid();
   //Serial.println(startPositionX);
+  ER5517.Goto_Text_XY(100, 100);
+  ER5517.Font_Select_16x32_32x32();
+  ER5517.Foreground_color_65k(Blue);
+  ER5517.Show_String("G");
+  ER5517.Show_String("O");
+  ER5517.Show_String("O");
+  ER5517.Show_String("G");
+  ER5517.Show_String("L");
+  ER5517.Show_String("E");
 }
 
-void loop() {
-  //drawGrid();
+void loop() {  
+
+ /*drawGrid();
   if(gamesStats.lifes == 0) {
     //loser print
     return;
@@ -96,9 +105,9 @@ void loop() {
   monstersBulletsMove();
   monstersShoot();
 
-  shootFromShip();
+  //shootFromShip();
   drawShip(White); 
-  moveShip('R');
+  moveShip('R');*/
 }
 
 void drawMonster(int r, int c, int colour) {
@@ -219,12 +228,17 @@ void moveShip(char direction) {
   }
   previousMillisForMovingShip = currentMillis;
 
-  if (spaceShip.xCoord > gridXLimit - shipWidth - moveDistanceForShip
+  if (spaceShip.xCoord > gridXLimit - shipWidth
       && direction == 'R'
       || spaceShip.xCoord <= 0 && direction == 'L') {
     return;
   }
   drawShip(Black);
+
+  if(spaceShip.xCoord == gridXLimit - shipWidth - 1) {
+    spaceShip.xCoord = gridXLimit - shipWidth;
+    Serial.println(spaceShip.xCoord);
+  }
 
   if (direction == 'R') {
     spaceShip.xCoord += moveDistanceForShip;

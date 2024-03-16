@@ -71,4 +71,13 @@ void drawGrid() {
              White);
 }
 
+void drawScore(char* score) {
+  ER5517.DrawSquare_Fill(gridXLimit * multiplier + 1, 
+                         0, 
+                         gridXLimit * multiplier + 2, 
+                         LCD_YSIZE_TFT - 1, 
+                         Green);
+  
+}
+
 #endif
