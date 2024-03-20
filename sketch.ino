@@ -9,8 +9,9 @@ unsigned long previousMillisForShooting = 0UL;
 unsigned long previousMillisForMovingBullets = 0UL;
 unsigned long previousMillisForMovingShipBullet = 0UL;
 unsigned long previousMillisForMovingShip = 0UL;
-unsigned long interval = 400UL;
 unsigned long intervalForShooting = random(500UL, 1000UL);
+unsigned long interval = 400UL; // Is here because when monsters speed up, 
+                               // this value changes 
 int columnsDestroyed = 0;
 
 typedef struct {
@@ -40,7 +41,7 @@ typedef struct {
   int lifes;
 }Stats;
 
-Stats gamesStats= {0, 3};
+Stats gamesStats= {0, 1};
 Bullet spaceShipBullet = {0, 0, true}; 
 const int maxBullets = 7 > columns * rows ? columns * rows : 7;
 Bullet allBullets[maxBullets];
@@ -79,13 +80,18 @@ void setup() {
 void loop() {  
  drawGrid();
  //drawScore(gamesStats.score);
-  if(gamesStats.lifes == 0) {
+ if(gamesStats.lifes == 0) {
+   drawLoserText();
+   delay(500);
+   restartGame();
     //loser print
     return;
   }
   if(columnsDestroyed == columns) {
+    drawWinningText();
+    delay(50000);
+    restartGame();
     //winner print
-    Serial.println("no way");
     return;
   }
   shootFromShip();
@@ -440,3 +446,27 @@ void lowerMonsters() {
     }
   }
 }
+
+void restartGame() {
+  previousMillisForMoving = 0UL;
+  previousMillisForInvulnerability = 0UL;
+  previousMillisForSpeedingUp = 0UL;
+  previousMillisForShooting = 0UL;
+  previousMillisForMovingBullets = 0UL;
+  previousMillisForMovingShipBullet = 0UL;
+  previousMillisForMovingShip = 0UL;
+  intervalForShooting = random(500UL, 1000UL);
+  interval = 400UL;
+
+  columnsDestroyed = columns;
+  gamesStats.lifes = 3;
+  gamesStats.score = 0;
+  Bullet spaceShipBullet = {0, 0, true};
+
+  ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
+  createBulletsForMonsters();
+  createMonsters();
+  }
+
+
+

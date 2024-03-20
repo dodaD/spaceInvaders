@@ -84,4 +84,77 @@ void drawScore(int score) {
   //ER5517.Show_String(scoreStr);
 }
 
+void drawGameOverText() {
+  ER5517.Font_Select_16x32_32x32();
+  ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
+                      (gridYLimit * multiplier) / 2 - 30);//Half of the text width
+  ER5517.Foreground_color_65k(Green);
+  ER5517.Show_String("G"); 
+  ER5517.Show_String("A"); 
+  ER5517.Show_String("M"); 
+  ER5517.Show_String("E"); 
+  ER5517.Show_String(" "); 
+  ER5517.Show_String("O"); 
+  ER5517.Show_String("V"); 
+  ER5517.Show_String("E"); 
+  ER5517.Show_String("R");
+
+  ER5517.Font_Select_12x24_24x24();
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 19) * multiplier, 
+                      (gridYLimit / 2) * multiplier);
+  ER5517.Show_String("R"); 
+  ER5517.Show_String("e"); 
+  ER5517.Show_String("s"); 
+  ER5517.Show_String("t"); 
+  ER5517.Show_String("a"); 
+  ER5517.Show_String("r"); 
+  ER5517.Show_String("t"); 
+  ER5517.Show_String(" "); 
+  ER5517.Show_String("i"); 
+  ER5517.Show_String("n"); 
+  ER5517.Show_String(" "); 
+  ER5517.Show_String("3"); 
+  ER5517.Show_String("."); 
+  ER5517.Show_String("."); 
+  ER5517.Show_String("."); 
+  ER5517.Show_String("2"); 
+  ER5517.Show_String("."); 
+  ER5517.Show_String("."); 
+  ER5517.Show_String("."); 
+  ER5517.Show_String("1"); 
+}
+
+void drawLoserText() {
+  drawGameOverText();
+  ER5517.Font_Select_16x32_32x32();
+  ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
+                      (gridYLimit * multiplier) / 2 - 66);
+  ER5517.Show_String("Y"); 
+  ER5517.Show_String("o"); 
+  ER5517.Show_String("u"); 
+  ER5517.Show_String(" "); 
+  ER5517.Show_String("l"); 
+  ER5517.Show_String("o"); 
+  ER5517.Show_String("s"); 
+  ER5517.Show_String("t"); 
+  ER5517.Show_String("!");
+}
+
+void drawWinningText() {
+  drawGameOverText();
+  ER5517.Foreground_color_65k(Yellow);
+  ER5517.Font_Select_16x32_32x32();
+  ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
+                      (gridYLimit * multiplier) / 2 - 66);
+  ER5517.Show_String("~");
+  ER5517.Show_String("Y"); 
+  ER5517.Show_String("o"); 
+  ER5517.Show_String("u"); 
+  ER5517.Show_String(" "); 
+  ER5517.Show_String("w"); 
+  ER5517.Show_String("o"); 
+  ER5517.Show_String("n"); 
+  ER5517.Show_String("!");
+}
+
 #endif
