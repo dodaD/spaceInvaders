@@ -9,7 +9,7 @@ unsigned long previousMillisForShooting = 0UL;
 unsigned long previousMillisForMovingBullets = 0UL;
 unsigned long previousMillisForMovingShipBullet = 0UL;
 unsigned long previousMillisForMovingShip = 0UL;
-unsigned long interval = 1000UL;
+unsigned long interval = 400UL;
 unsigned long intervalForShooting = random(500UL, 1000UL);
 int columnsDestroyed = 0;
 
@@ -70,24 +70,15 @@ void setup() {
   ER5517.Active_Window_WH(LCD_XSIZE_TFT,LCD_YSIZE_TFT); 
 
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
-  // createMonsters();
-  //createBulletsForMonsters();
-  //drawGrid();
+  createMonsters();
+  createBulletsForMonsters();
+  drawGrid();
   //Serial.println(startPositionX);
-  ER5517.Goto_Text_XY(100, 100);
-  ER5517.Font_Select_16x32_32x32();
-  ER5517.Foreground_color_65k(Blue);
-  ER5517.Show_String("G");
-  ER5517.Show_String("O");
-  ER5517.Show_String("O");
-  ER5517.Show_String("G");
-  ER5517.Show_String("L");
-  ER5517.Show_String("E");
-}
+  }
 
 void loop() {  
-
- /*drawGrid();
+ drawGrid();
+ //drawScore(gamesStats.score);
   if(gamesStats.lifes == 0) {
     //loser print
     return;
@@ -99,7 +90,7 @@ void loop() {
   }
   shootFromShip();
   moveShipBullets();
-  checkCollisionWithMonsters();
+  //checkCollisionWithMonsters();
   checkCollisionWithShip();
   moveMonsters();
   monstersBulletsMove();
@@ -107,7 +98,7 @@ void loop() {
 
   //shootFromShip();
   drawShip(White); 
-  moveShip('R');*/
+  //moveShip('R');
 }
 
 void drawMonster(int r, int c, int colour) {
@@ -228,16 +219,15 @@ void moveShip(char direction) {
   }
   previousMillisForMovingShip = currentMillis;
 
-  if (spaceShip.xCoord > gridXLimit - shipWidth
-      && direction == 'R'
-      || spaceShip.xCoord <= 0 && direction == 'L') {
+  if (spaceShip.xCoord <= 0 && direction == 'L') {
     return;
   }
   drawShip(Black);
 
-  if(spaceShip.xCoord == gridXLimit - shipWidth - 1) {
+  if(spaceShip.xCoord > gridXLimit - shipWidth - moveDistanceForShip) {
     spaceShip.xCoord = gridXLimit - shipWidth;
-    Serial.println(spaceShip.xCoord);
+    drawShip(White);
+    return;
   }
 
   if (direction == 'R') {

@@ -22,7 +22,7 @@ int adjustCoordY(float oldYCoord) {
 }
 
 void drawFigure(int x, int y, int width, int height, int colour) {
-  if (x >= gridXLimit + width
+  if (x > gridXLimit
     || y > gridYLimit
     || x <  0 - width
     || y < height
@@ -71,13 +71,17 @@ void drawGrid() {
              White);
 }
 
-void drawScore(char* score) {
+void drawScore(int score) {
   ER5517.DrawSquare_Fill(gridXLimit * multiplier + 1, 
                          0, 
                          gridXLimit * multiplier + 2, 
                          LCD_YSIZE_TFT - 1, 
                          Green);
-  
+  char scoreStr = score;
+  ER5517.Goto_Text_XY(700, 100);
+  ER5517.Foreground_color_65k(Green);
+  //ER5517.Show_String("S"); 
+  //ER5517.Show_String(scoreStr);
 }
 
 #endif
