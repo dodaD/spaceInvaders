@@ -82,14 +82,14 @@ void loop() {
  //drawScore(gamesStats.score);
  if(gamesStats.lifes == 0) {
    drawLoserText();
-   delay(500);
+   delay(5000);
    restartGame();
     //loser print
     return;
   }
   if(columnsDestroyed == columns) {
     drawWinningText();
-    delay(50000);
+    delay(5000);
     restartGame();
     //winner print
     return;
@@ -458,7 +458,7 @@ void restartGame() {
   intervalForShooting = random(500UL, 1000UL);
   interval = 400UL;
 
-  columnsDestroyed = columns;
+  columnsDestroyed = 0;
   gamesStats.lifes = 3;
   gamesStats.score = 0;
   Bullet spaceShipBullet = {0, 0, true};
@@ -466,7 +466,9 @@ void restartGame() {
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   createBulletsForMonsters();
   createMonsters();
-  }
+}
 
-
+void quit() {
+  ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
+}
 

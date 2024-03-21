@@ -138,6 +138,14 @@ void drawLoserText() {
   ER5517.Show_String("s"); 
   ER5517.Show_String("t"); 
   ER5517.Show_String("!");
+  int exampleValue = 13;
+  char newChar[2];
+
+  String temp_str = String(exampleValue);
+  temp_str.toCharArray(newChar,2); 
+  char (*p)[2]; 
+  p = &newChar;
+  ER5517.Show_String(p[0]);
 }
 
 void drawWinningText() {
