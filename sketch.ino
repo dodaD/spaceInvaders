@@ -210,7 +210,7 @@ void checkCollisionWithMonsters() {
         drawMonster(r, c, Black);
         allMonsters[r][c].isDeleted = true;
         monstersColumns[c] -= 1;
-        gamesStats.score += 10 + 10 * r;
+        gamesStats.score += (10 * rows) - 10 * r;
         if (monstersColumns[c] == 0) {
           columnsDestroyed += 1;
         }
