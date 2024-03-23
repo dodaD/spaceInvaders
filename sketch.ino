@@ -41,7 +41,7 @@ typedef struct {
   int lifes;
 }Stats;
 
-Stats gamesStats= {0, 1};
+Stats gamesStats = {0, 3};
 Bullet spaceShipBullet = {0, 0, true}; 
 const int maxBullets = 7 > columns * rows ? columns * rows : 7;
 Bullet allBullets[maxBullets];
@@ -79,6 +79,7 @@ void setup() {
 
 void loop() {  
  drawGrid();
+ drawStats(gamesStats.score ,gamesStats.lifes);
  //drawScore(gamesStats.score);
  if(gamesStats.lifes == 0) {
    drawLoserText();
@@ -96,7 +97,7 @@ void loop() {
   }
   shootFromShip();
   moveShipBullets();
-  //checkCollisionWithMonsters();
+  checkCollisionWithMonsters();
   checkCollisionWithShip();
   moveMonsters();
   monstersBulletsMove();
@@ -209,6 +210,7 @@ void checkCollisionWithMonsters() {
         drawMonster(r, c, Black);
         allMonsters[r][c].isDeleted = true;
         monstersColumns[c] -= 1;
+        gamesStats.score += 10 + 10 * r;
         if (monstersColumns[c] == 0) {
           columnsDestroyed += 1;
         }
@@ -462,6 +464,7 @@ void restartGame() {
   gamesStats.lifes = 3;
   gamesStats.score = 0;
   Bullet spaceShipBullet = {0, 0, true};
+  spaceShip.isInvulnerable = false;
 
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   createBulletsForMonsters();

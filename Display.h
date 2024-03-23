@@ -8,6 +8,7 @@
 // #define LCD_YSIZE_TFT    480
 
 int multiplier = 6;
+int previousAmountOfLives = 0; //To optimize re-drawing of ships that symbolize lifes left
 
 int adjustCoordX(float oldXCoord) {
   float newXCoord = oldXCoord * multiplier;
@@ -71,17 +72,48 @@ void drawGrid() {
              White);
 }
 
-void drawScore(int score) {
-  ER5517.DrawSquare_Fill(gridXLimit * multiplier + 1, 
-                         0, 
-                         gridXLimit * multiplier + 2, 
-                         LCD_YSIZE_TFT - 1, 
-                         Green);
-  char scoreStr = score;
-  ER5517.Goto_Text_XY(700, 100);
+drawStats(int score, int lifes) {
   ER5517.Foreground_color_65k(Green);
-  //ER5517.Show_String("S"); 
-  //ER5517.Show_String(scoreStr);
+  ER5517.Font_Select_12x24_24x24();
+  ER5517.Goto_Text_XY(500, 57);
+  char newScore[8];
+
+  String tempScore = String(score);
+  tempScore.toCharArray(newScore, 8); 
+  char* pointerToScore = newScore;
+
+  ER5517.Show_String("Score: "); 
+  ER5517.Show_String(pointerToScore); // SEE MAX VALUE OF INT!!!
+
+  if(previousAmountOfLives == lifes) {
+    return;
+  }
+  int width = 39;
+  int height = 15;
+  int startPointX = 500;
+  int startPointY = 30;
+  int gap = 5;
+
+  for(int l = 0; l < previousAmountOfLives; l++) {
+    ER5517.DrawSquare_Fill(
+      startPointX + (width + gap) * l,
+      startPointY,
+      startPointX + width + (width + gap) * l,
+      startPointY + height,
+      Black
+    ); //Draw mini-ships to represent lives left
+  }
+
+  for(int l = 0; l < lifes; l++) {
+    ER5517.DrawSquare_Fill(
+      startPointX + (width + gap) * l,
+      startPointY,
+      startPointX + width + (width + gap) * l,
+      startPointY + height,
+      Green
+    ); //Draw mini-ships to represent lives left
+  }
+  previousAmountOfLives = lifes;
 }
 
 void drawGameOverText() {
@@ -89,39 +121,12 @@ void drawGameOverText() {
   ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
                       (gridYLimit * multiplier) / 2 - 30);//Half of the text width
   ER5517.Foreground_color_65k(Green);
-  ER5517.Show_String("G"); 
-  ER5517.Show_String("A"); 
-  ER5517.Show_String("M"); 
-  ER5517.Show_String("E"); 
-  ER5517.Show_String(" "); 
-  ER5517.Show_String("O"); 
-  ER5517.Show_String("V"); 
-  ER5517.Show_String("E"); 
-  ER5517.Show_String("R");
+  ER5517.Show_String("GAME OVER!"); 
 
   ER5517.Font_Select_12x24_24x24();
   ER5517.Goto_Text_XY((gridXLimit / 2 - 19) * multiplier, 
                       (gridYLimit / 2) * multiplier);
-  ER5517.Show_String("R"); 
-  ER5517.Show_String("e"); 
-  ER5517.Show_String("s"); 
-  ER5517.Show_String("t"); 
-  ER5517.Show_String("a"); 
-  ER5517.Show_String("r"); 
-  ER5517.Show_String("t"); 
-  ER5517.Show_String(" "); 
-  ER5517.Show_String("i"); 
-  ER5517.Show_String("n"); 
-  ER5517.Show_String(" "); 
-  ER5517.Show_String("3"); 
-  ER5517.Show_String("."); 
-  ER5517.Show_String("."); 
-  ER5517.Show_String("."); 
-  ER5517.Show_String("2"); 
-  ER5517.Show_String("."); 
-  ER5517.Show_String("."); 
-  ER5517.Show_String("."); 
-  ER5517.Show_String("1"); 
+  ER5517.Show_String("Restart?"); 
 }
 
 void drawLoserText() {
@@ -129,23 +134,7 @@ void drawLoserText() {
   ER5517.Font_Select_16x32_32x32();
   ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
                       (gridYLimit * multiplier) / 2 - 66);
-  ER5517.Show_String("Y"); 
-  ER5517.Show_String("o"); 
-  ER5517.Show_String("u"); 
-  ER5517.Show_String(" "); 
-  ER5517.Show_String("l"); 
-  ER5517.Show_String("o"); 
-  ER5517.Show_String("s"); 
-  ER5517.Show_String("t"); 
-  ER5517.Show_String("!");
-  int exampleValue = 13;
-  char newChar[2];
-
-  String temp_str = String(exampleValue);
-  temp_str.toCharArray(newChar,2); 
-  char (*p)[2]; 
-  p = &newChar;
-  ER5517.Show_String(p[0]);
+  ER5517.Show_String("You have lost!"); 
 }
 
 void drawWinningText() {
@@ -154,15 +143,7 @@ void drawWinningText() {
   ER5517.Font_Select_16x32_32x32();
   ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
                       (gridYLimit * multiplier) / 2 - 66);
-  ER5517.Show_String("~");
-  ER5517.Show_String("Y"); 
-  ER5517.Show_String("o"); 
-  ER5517.Show_String("u"); 
-  ER5517.Show_String(" "); 
-  ER5517.Show_String("w"); 
-  ER5517.Show_String("o"); 
-  ER5517.Show_String("n"); 
-  ER5517.Show_String("!");
+  ER5517.Show_String("You won!");
 }
 
 #endif
