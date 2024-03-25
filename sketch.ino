@@ -20,7 +20,7 @@ unsigned long intervalForShooting = random(500UL, 1000UL);
 unsigned long interval = 400UL; // Is here because when monsters speed up, 
                                // this value changes 
 int columnsDestroyed = 0;
-unsigned long minPassed = 0; //declare globally in case of restarting the game
+unsigned long secPassed = 0; //declare globally in case of restarting the game
 
 typedef struct {
   int xCoord;
@@ -100,8 +100,7 @@ void loop() {
     return;
   }
  if(columnsDestroyed == columns) {
-   int bonusPointsForSpeed = (5 - (millis() / 60000 - minPassed)) * 10; // TODO:: change minutes to seconds
-   minPassed = millis() / 60000;
+   int bonusPointsForSpeed = (300 - (millis() / 1000 - secPassed)) / 10 * 2;
    drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
    drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
        0);
@@ -110,6 +109,7 @@ void loop() {
    } else if(digitalRead(buttonPinGreen) == LOW) {
      restartGame();
    }
+    powerOn = false;
    return;
  }
  drawStats(gamesStats.score, gamesStats.lifes);
@@ -269,7 +269,8 @@ void moveShip(char direction) {
   }
   drawShip(Black);
 
-  if(spaceShip.xCoord > gridXLimit - shipWidth - moveDistanceForShip) {
+  if(spaceShip.xCoord > gridXLimit - shipWidth - moveDistanceForShip
+    && direction == 'R') {
     spaceShip.xCoord = gridXLimit - shipWidth;
     drawShip(White);
     return;
@@ -497,6 +498,7 @@ void restartGame() {
   previousMillisForMovingShip = 0UL;
   intervalForShooting = random(500UL, 1000UL);
   interval = 400UL;
+  secPassed = millis() / 1000;
 
   columnsDestroyed = 0;
   gamesStats.lifes = 3;

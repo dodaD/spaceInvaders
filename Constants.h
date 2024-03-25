@@ -22,8 +22,8 @@
 #define moveDistanceForMonsters 1
 #define columnGap 4
 #define rowGap 2
-#define rows 5
-#define columns 6
+#define rows 1
+#define columns 1
 #define maxRows ((gridYLimit - spaceShipY) / (sideOfMonster + rowGap))
 #define maxColumns ((gridXLimit + columnGap) / (sideOfMonster + columnGap))
 
