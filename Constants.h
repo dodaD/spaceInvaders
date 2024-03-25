@@ -12,7 +12,7 @@
 #define intervalForInvulnerability 30000UL
 #define intervalForSpeedingUp 1000UL
 #define intervalForMovingBullets 50UL
-#define intervalForMovingShip 500UL
+#define intervalForMovingShip 150UL
 #define shipWidth 7
 #define shipHeight 3
 #define spaceShipY 20
@@ -22,8 +22,8 @@
 #define moveDistanceForMonsters 1
 #define columnGap 4
 #define rowGap 2
-#define rows 2
-#define columns 4
+#define rows 5
+#define columns 6
 #define maxRows ((gridYLimit - spaceShipY) / (sideOfMonster + rowGap))
 #define maxColumns ((gridXLimit + columnGap) / (sideOfMonster + columnGap))
 

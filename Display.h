@@ -119,31 +119,55 @@ drawStats(int score, int lifes) {
 void drawGameOverText() {
   ER5517.Font_Select_16x32_32x32();
   ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
-                      (gridYLimit * multiplier) / 2 - 30);//Half of the text width
+                      (gridYLimit * multiplier) / 2 - 66);//Half of the text width
   ER5517.Foreground_color_65k(Green);
   ER5517.Show_String("GAME OVER!"); 
 
   ER5517.Font_Select_12x24_24x24();
-  ER5517.Goto_Text_XY((gridXLimit / 2 - 19) * multiplier, 
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 38) * multiplier, 
                       (gridYLimit / 2) * multiplier);
-  ER5517.Show_String("Restart?"); 
+  ER5517.Show_String("To restart the game, press green button"); 
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 30) * multiplier, 
+                      (gridYLimit / 2 + 5) * multiplier);
+  ER5517.Show_String("To quit, press yellow button"); 
 }
 
 void drawLoserText() {
   drawGameOverText();
+  ER5517.Foreground_color_65k(Red);
   ER5517.Font_Select_16x32_32x32();
-  ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
-                      (gridYLimit * multiplier) / 2 - 66);
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 15) * multiplier, 
+                      (gridYLimit * multiplier) / 2 - 30);
   ER5517.Show_String("You have lost!"); 
 }
 
-void drawWinningText() {
+void drawWinningText(int bonusPointsForSpeed, int bonusPointsForLivesLeft) {
   drawGameOverText();
   ER5517.Foreground_color_65k(Yellow);
   ER5517.Font_Select_16x32_32x32();
-  ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
-                      (gridYLimit * multiplier) / 2 - 66);
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 10) * multiplier, 
+                      (gridYLimit * multiplier) / 2 - 30);
   ER5517.Show_String("You won!");
+  char newBonusPointsForSpeed[3];
+  char newBonusPointsForLivesLeft[3];
+
+  String tempBonusPointsForSpeed = String(bonusPointsForSpeed);
+  String tempBonusPointsForLivesLeft = String(bonusPointsForLivesLeft);
+  tempBonusPointsForSpeed.toCharArray(newBonusPointsForSpeed, 3); 
+  tempBonusPointsForLivesLeft.toCharArray(newBonusPointsForLivesLeft, 3); 
+  char* pointerToBonusPointsForSpeed = newBonusPointsForSpeed;
+  char* pointerToBonusPointsForLivesLeft = newBonusPointsForLivesLeft;
+
+  ER5517.Font_Select_12x24_24x24();
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 30) * multiplier, 
+                      (gridYLimit / 2 + 10) * multiplier);
+  ER5517.Foreground_color_65k(Green);
+  ER5517.Show_String("Additional points - speed: +");
+  ER5517.Show_String(pointerToBonusPointsForSpeed);
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 34) * multiplier, 
+                      (gridYLimit / 2 + 15) * multiplier);
+  ER5517.Show_String("Additional points - lives left: +");
+  ER5517.Show_String(pointerToBonusPointsForLivesLeft);
 }
 
 #endif

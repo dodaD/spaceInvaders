@@ -1,3 +1,10 @@
+int buttonPinBlack = A0;
+int buttonPinBlue = A1;
+int buttonPinRed = A2;
+int buttonPinGreen = A3;
+int buttonPinYellow = A4;
+bool powerOn = true;
+
 #include "ScreenDriver.h"
 #include "Display.h"
 #include "Constants.h"
@@ -13,6 +20,7 @@ unsigned long intervalForShooting = random(500UL, 1000UL);
 unsigned long interval = 400UL; // Is here because when monsters speed up, 
                                // this value changes 
 int columnsDestroyed = 0;
+unsigned long minPassed = 0; //declare globally in case of restarting the game
 
 typedef struct {
   int xCoord;
@@ -47,6 +55,12 @@ const int maxBullets = 7 > columns * rows ? columns * rows : 7;
 Bullet allBullets[maxBullets];
 
 void setup() {  
+   pinMode(buttonPinBlack, INPUT_PULLUP);
+   pinMode(buttonPinBlue, INPUT_PULLUP);
+   pinMode(buttonPinRed, INPUT_PULLUP);
+   pinMode(buttonPinGreen, INPUT_PULLUP);
+   pinMode(buttonPinYellow, INPUT_PULLUP);
+
   Serial.begin(9600);
   pinMode(5,   OUTPUT);
   digitalWrite(5, HIGH);//Disable  SD 
@@ -77,35 +91,57 @@ void setup() {
   //Serial.println(startPositionX);
   }
 
-void loop() {  
- drawGrid();
- drawStats(gamesStats.score ,gamesStats.lifes);
- //drawScore(gamesStats.score);
+void loop() { 
+  if(!powerOn) {
+    if(digitalRead(buttonPinGreen) == LOW) {
+      restartGame();
+      powerOn = true;
+    }
+    return;
+  }
+ if(columnsDestroyed == columns) {
+   int bonusPointsForSpeed = (5 - (millis() / 60000 - minPassed)) * 10; // TODO:: change minutes to seconds
+   minPassed = millis() / 60000;
+   drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
+   drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
+       0);
+   if (digitalRead(buttonPinYellow) == LOW) {
+     quit();
+   } else if(digitalRead(buttonPinGreen) == LOW) {
+     restartGame();
+   }
+   return;
+ }
+ drawStats(gamesStats.score, gamesStats.lifes);
  if(gamesStats.lifes == 0) {
    drawLoserText();
-   delay(5000);
-   restartGame();
-    //loser print
-    return;
-  }
-  if(columnsDestroyed == columns) {
-    drawWinningText();
-    delay(5000);
-    restartGame();
-    //winner print
-    return;
-  }
-  shootFromShip();
-  moveShipBullets();
-  checkCollisionWithMonsters();
-  checkCollisionWithShip();
-  moveMonsters();
-  monstersBulletsMove();
-  monstersShoot();
+   if (digitalRead(buttonPinYellow) == LOW) {
+     quit();
+   } else if(digitalRead(buttonPinGreen) == LOW) {
+     restartGame();
+   }
+   return;
+ }
+ drawGrid();
+ moveShipBullets();
+ moveMonsters();
+ checkCollisionWithMonsters();
+ checkCollisionWithShip();
+ monstersBulletsMove();
+ monstersShoot();
+ drawShip(White); 
 
-  //shootFromShip();
-  drawShip(White); 
-  //moveShip('R');
+  if (digitalRead(buttonPinBlack) == LOW){
+    moveShip('L');
+  }
+
+  if (digitalRead(buttonPinBlue) == LOW){
+    moveShip('R');
+  }
+
+  if (digitalRead(buttonPinRed) == LOW){
+    shootFromShip();
+  }
 }
 
 void drawMonster(int r, int c, int colour) {
@@ -208,6 +244,7 @@ void checkCollisionWithMonsters() {
          ){
         spaceShipBullet.isReadyToShoot = true;
         drawMonster(r, c, Black);
+        drawShipBullet(Black);
         allMonsters[r][c].isDeleted = true;
         monstersColumns[c] -= 1;
         gamesStats.score += (10 * rows) - 10 * r;
@@ -224,7 +261,7 @@ void moveShip(char direction) {
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForMovingShip < intervalForMovingShip) {
     return;
-  }
+  }  
   previousMillisForMovingShip = currentMillis;
 
   if (spaceShip.xCoord <= 0 && direction == 'L') {
@@ -450,6 +487,7 @@ void lowerMonsters() {
 }
 
 void restartGame() {
+  ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   previousMillisForMoving = 0UL;
   previousMillisForInvulnerability = 0UL;
   previousMillisForSpeedingUp = 0UL;
@@ -466,12 +504,12 @@ void restartGame() {
   Bullet spaceShipBullet = {0, 0, true};
   spaceShip.isInvulnerable = false;
 
-  ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   createBulletsForMonsters();
   createMonsters();
 }
 
 void quit() {
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
+  powerOn = false;
 }
 
