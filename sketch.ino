@@ -1,8 +1,8 @@
 int buttonPinBlack = A0;
 int buttonPinBlue = A1;
 int buttonPinRed = A2;
-int buttonPinGreen = A3;
-int buttonPinYellow = A4;
+int buttonPinGreen = A4;
+int buttonPinYellow = A3;
 bool powerOn = true;
 
 #include "ScreenDriver.h"
@@ -18,7 +18,7 @@ unsigned long previousMillisForMovingShipBullet = 0UL;
 unsigned long previousMillisForMovingShip = 0UL;
 unsigned long intervalForShooting = random(500UL, 1000UL);
 unsigned long interval = 400UL; // Is here because when monsters speed up, 
-                               // this value changes 
+                                // this value changes 
 int columnsDestroyed = 0;
 unsigned long secPassed = 0; //declare globally in case of restarting the game
 
@@ -55,18 +55,18 @@ const int maxBullets = 7 > columns * rows ? columns * rows : 7;
 Bullet allBullets[maxBullets];
 
 void setup() {  
-   pinMode(buttonPinBlack, INPUT_PULLUP);
-   pinMode(buttonPinBlue, INPUT_PULLUP);
-   pinMode(buttonPinRed, INPUT_PULLUP);
-   pinMode(buttonPinGreen, INPUT_PULLUP);
-   pinMode(buttonPinYellow, INPUT_PULLUP);
+  pinMode(buttonPinBlack, INPUT_PULLUP);
+  pinMode(buttonPinBlue, INPUT_PULLUP);
+  pinMode(buttonPinRed, INPUT_PULLUP);
+  pinMode(buttonPinGreen, INPUT_PULLUP);
+  pinMode(buttonPinYellow, INPUT_PULLUP);
 
   Serial.begin(9600);
   pinMode(5,   OUTPUT);
   digitalWrite(5, HIGH);//Disable  SD 
   pinMode(2,   OUTPUT);
   digitalWrite(2, HIGH);//Disable  RTP   
-  
+
   ER5517.Parallel_Init();
   ER5517.HW_Reset();
   ER5517.System_Check_Temp();
@@ -89,47 +89,43 @@ void setup() {
   createBulletsForMonsters();
   drawGrid();
   //Serial.println(startPositionX);
-  }
+}
 
 void loop() { 
   if(!powerOn) {
     if(digitalRead(buttonPinGreen) == LOW) {
       restartGame();
       powerOn = true;
-    }
+    } else if (digitalRead(buttonPinYellow) == LOW) {
+      quit();
+    } 
+    return;
+  } 
+
+  if(columnsDestroyed == columns) {
+    int bonusPointsForSpeed = (300 - (millis() / 1000 - secPassed)) / 10 * 2;
+    drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
+    drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
+        0);
+    powerOn = false;
     return;
   }
- if(columnsDestroyed == columns) {
-   int bonusPointsForSpeed = (300 - (millis() / 1000 - secPassed)) / 10 * 2;
-   drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
-   drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
-       0);
-   if (digitalRead(buttonPinYellow) == LOW) {
-     quit();
-   } else if(digitalRead(buttonPinGreen) == LOW) {
-     restartGame();
-   }
+
+  drawStats(gamesStats.score, gamesStats.lifes);
+  if(gamesStats.lifes == 0) {
+    drawLoserText();
     powerOn = false;
-   return;
- }
- drawStats(gamesStats.score, gamesStats.lifes);
- if(gamesStats.lifes == 0) {
-   drawLoserText();
-   if (digitalRead(buttonPinYellow) == LOW) {
-     quit();
-   } else if(digitalRead(buttonPinGreen) == LOW) {
-     restartGame();
-   }
-   return;
- }
- drawGrid();
- moveShipBullets();
- moveMonsters();
- checkCollisionWithMonsters();
- checkCollisionWithShip();
- monstersBulletsMove();
- monstersShoot();
- drawShip(White); 
+    return;
+  }
+
+  drawGrid();
+  moveShipBullets();
+  moveMonsters();
+  checkCollisionWithMonsters();
+  checkCollisionWithShip();
+  monstersBulletsMove();
+  monstersShoot();
+  drawShip(White); 
 
   if (digitalRead(buttonPinBlack) == LOW){
     moveShip('L');
@@ -157,11 +153,11 @@ void drawMonster(int r, int c, int colour) {
 void drawShip(int colour) {
   if(spaceShip.isInvulnerable) {
     drawFigure(spaceShip.xCoord, 
-      spaceShip.yCoord,
-      shipWidth, 
-      shipHeight, 
-      colour == Black ? Black : Blue
-    );
+        spaceShip.yCoord,
+        shipWidth, 
+        shipHeight, 
+        colour == Black ? Black : Blue
+        );
     return;
   }
   drawFigure(spaceShip.xCoord, 
@@ -169,7 +165,7 @@ void drawShip(int colour) {
       shipWidth, 
       shipHeight, 
       colour
-  );
+      );
 }
 
 void drawMonstersBullet(int b, int colour) {
@@ -183,11 +179,11 @@ void drawMonstersBullet(int b, int colour) {
 
 void drawShipBullet(int colour) {
   drawFigure(spaceShipBullet.xCoord,
-        spaceShipBullet.yCoord, 
-        widthOfBullet, 
-        heightOfBullet, 
-        colour
-   );
+      spaceShipBullet.yCoord, 
+      widthOfBullet, 
+      heightOfBullet, 
+      colour
+      );
 }
 
 void shootFromShip() {
@@ -197,7 +193,7 @@ void shootFromShip() {
   drawShipBullet(Black);
   spaceShipBullet.isReadyToShoot = false;
   spaceShipBullet.xCoord = spaceShip.xCoord + shipWidth / 2;
-  spaceShipBullet.yCoord = spaceShip.yCoord + heightOfBullet; // TODO:
+  spaceShipBullet.yCoord = spaceShip.yCoord + heightOfBullet; 
   drawShipBullet(Red);
 }
 
@@ -207,20 +203,20 @@ void moveShipBullets() {
   }
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForMovingShipBullet
-    < intervalForMovingBullets) {
+      < intervalForMovingBullets) {
     return;
   }
   previousMillisForMovingShipBullet = currentMillis;
 
-    if(!spaceShipBullet.isReadyToShoot) {
-      drawShipBullet(Black);
-      if(spaceShipBullet.yCoord >= gridYLimit) {
-        spaceShipBullet.isReadyToShoot = true;
-        return;
-      }       
-      spaceShipBullet.yCoord += 1;
-      drawShipBullet(Red);
-    }
+  if(!spaceShipBullet.isReadyToShoot) {
+    drawShipBullet(Black);
+    if(spaceShipBullet.yCoord >= gridYLimit) {
+      spaceShipBullet.isReadyToShoot = true;
+      return;
+    }       
+    spaceShipBullet.yCoord += 1;
+    drawShipBullet(Red);
+  }
 }
 
 void checkCollisionWithMonsters() {
@@ -270,7 +266,7 @@ void moveShip(char direction) {
   drawShip(Black);
 
   if(spaceShip.xCoord > gridXLimit - shipWidth - moveDistanceForShip
-    && direction == 'R') {
+      && direction == 'R') {
     spaceShip.xCoord = gridXLimit - shipWidth;
     drawShip(White);
     return;
@@ -309,11 +305,15 @@ void moveMonsters() {
     return;
   }
   if(intervalForSpeedingUp <
-    currentMillis - previousMillisForSpeedingUp
-    && interval >= 10UL
-    ) {
-    interval -= 10UL;
+      currentMillis - previousMillisForSpeedingUp
+      && interval >= 50UL
+    ) { 
+    Serial.println("Before: ");
+    Serial.println(interval);
+    interval -= 50UL;
     previousMillisForSpeedingUp = currentMillis;
+    Serial.println("After: ");
+    Serial.println(interval);
   }
 
   for (int r = 0; r < rows; r++) {
@@ -339,7 +339,7 @@ void createBulletsForMonsters() {
     allBullets[i].isReadyToShoot = true;
   }
 }
- 
+
 void monstersShoot() {
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForShooting < intervalForShooting) {
@@ -378,7 +378,7 @@ void shootRandomly(int b) {
 void monstersBulletsMove() {
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForMovingBullets
-    < intervalForMovingBullets) {
+      < intervalForMovingBullets) {
     return;
   }
   previousMillisForMovingBullets = currentMillis;
@@ -402,7 +402,7 @@ void checkCollisionWithShip() {
   if (spaceShip.isInvulnerable &&
       currentMillis - previousMillisForInvulnerability 
       > intervalForInvulnerability) {
-      spaceShip.isInvulnerable = false;
+    spaceShip.isInvulnerable = false;
   }
 
   for (int b = 0; b < maxBullets; b++) {
@@ -475,6 +475,7 @@ void lowerMonsters() {
         gamesStats.lifes = 0;
         return;
       }
+
       drawFigure(
           allMonsters[r][c].xCoord,
           allMonsters[r][c].yCoord,
@@ -505,6 +506,9 @@ void restartGame() {
   gamesStats.score = 0;
   Bullet spaceShipBullet = {0, 0, true};
   spaceShip.isInvulnerable = false;
+  spaceShip.xCoord = spaceShipX;
+  powerOn = true;
+  monstersMovingDirection = 'R';
 
   createBulletsForMonsters();
   createMonsters();

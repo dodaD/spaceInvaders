@@ -2993,7 +2993,7 @@ void ER5517Basic::Show_String(char *str)
       ++str;   
     }
     Check_2D_Busy();
-
+  
     Graphic_Mode(); //back to graphic mode;
 }
 
