@@ -17,7 +17,7 @@ unsigned long previousMillisForMovingBullets = 0UL;
 unsigned long previousMillisForMovingShipBullet = 0UL;
 unsigned long previousMillisForMovingShip = 0UL;
 unsigned long intervalForShooting = random(500UL, 1000UL);
-unsigned long interval = 400UL; // Is here because when monsters speed up, 
+unsigned long interval = 1600UL; // Is here because when monsters speed up, 
                                 // this value changes 
 int columnsDestroyed = 0;
 unsigned long secPassed = 0; //declare globally in case of restarting the game
@@ -103,7 +103,8 @@ void loop() {
   } 
 
   if(columnsDestroyed == columns) {
-    int bonusPointsForSpeed = (300 - (millis() / 1000 - secPassed)) / 10 * 2;
+    int bonusPointsForSpeed = (rows * columns * 20 - 
+        (millis() / 1000 - secPassed)) / 10 * 2;
     drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
     drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
         0);
@@ -122,7 +123,7 @@ void loop() {
   moveShipBullets();
   moveMonsters();
   checkCollisionWithMonsters();
-  checkCollisionWithShip();
+  //checkCollisionWithShip();
   monstersBulletsMove();
   monstersShoot();
   drawShip(White); 
@@ -169,6 +170,9 @@ void drawShip(int colour) {
 }
 
 void drawMonstersBullet(int b, int colour) {
+  if (allBullets[b].isReadyToShoot) {
+      return;
+    }
   drawFigure(allBullets[b].xCoord,
       allBullets[b].yCoord, 
       widthOfBullet, 
@@ -306,14 +310,10 @@ void moveMonsters() {
   }
   if(intervalForSpeedingUp <
       currentMillis - previousMillisForSpeedingUp
-      && interval >= 50UL
+      && interval >= 200UL
     ) { 
-    Serial.println("Before: ");
-    Serial.println(interval);
-    interval -= 50UL;
+    interval -= 200UL;
     previousMillisForSpeedingUp = currentMillis;
-    Serial.println("After: ");
-    Serial.println(interval);
   }
 
   for (int r = 0; r < rows; r++) {
@@ -347,7 +347,10 @@ void monstersShoot() {
   }
   intervalForShooting = random(500UL, 1000UL);
   previousMillisForShooting = currentMillis;
-  for(int b = 0; b < maxBullets; b++) {
+  for(int b = 0; b < columns - columnsDestroyed; b++) { //instead going through
+                                                       //all bullets, go just as
+                                                       //much as there's columns
+                                                       //left
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
       allBullets[b].isReadyToShoot = false;
       shootRandomly(b);
@@ -384,10 +387,10 @@ void monstersBulletsMove() {
   previousMillisForMovingBullets = currentMillis;
 
   for(int b = 0; b < maxBullets; b++) {  
-    drawMonstersBullet(b, Black);
     if(allBullets[b].isReadyToShoot) {
       continue;
     }
+    drawMonstersBullet(b, Black);
     if(allBullets[b].yCoord < 0 + heightOfBullet) {
       allBullets[b].isReadyToShoot = true;
       return;
@@ -498,13 +501,13 @@ void restartGame() {
   previousMillisForMovingShipBullet = 0UL;
   previousMillisForMovingShip = 0UL;
   intervalForShooting = random(500UL, 1000UL);
-  interval = 400UL;
+  interval = 1600UL;
   secPassed = millis() / 1000;
 
   columnsDestroyed = 0;
   gamesStats.lifes = 3;
   gamesStats.score = 0;
-  Bullet spaceShipBullet = {0, 0, true};
+  spaceShipBullet = {0, 0, true};
   spaceShip.isInvulnerable = false;
   spaceShip.xCoord = spaceShipX;
   powerOn = true;
