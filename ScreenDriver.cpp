@@ -3020,7 +3020,7 @@ void ER5517Basic::Show_picture(unsigned long numbers,const unsigned char *datap)
     ER5517.LCD_DataWrite(pgm_read_byte(&datap[i]));
     Check_Mem_WR_FIFO_not_Full();
   }
-
+     
 }
 
 ER5517Basic ER5517=ER5517Basic();

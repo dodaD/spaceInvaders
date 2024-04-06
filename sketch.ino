@@ -18,7 +18,7 @@ unsigned long previousMillisForMovingShipBullet = 0UL;
 unsigned long previousMillisForMovingShip = 0UL;
 unsigned long intervalForShooting = random(500UL, 1000UL);
 unsigned long interval = 1600UL; // Is here because when monsters speed up, 
-                                // this value changes 
+                                 // this value changes 
 int columnsDestroyed = 0;
 unsigned long secPassed = 0; //declare globally in case of restarting the game
 
@@ -104,7 +104,10 @@ void loop() {
 
   if(columnsDestroyed == columns) {
     int bonusPointsForSpeed = (rows * columns * 20 - 
-        (millis() / 1000 - secPassed)) / 10 * 2;
+        (millis() / 1000 - secPassed)) / 10 * 2; // BUG: when negative value, 
+                                                 //show a random number (13122)
+    Serial.println(millis() / 1000);
+    Serial.println(bonusPointsForSpeed);
     drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
     drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
         0);
@@ -171,8 +174,8 @@ void drawShip(int colour) {
 
 void drawMonstersBullet(int b, int colour) {
   if (allBullets[b].isReadyToShoot) {
-      return;
-    }
+    return;
+  }
   drawFigure(allBullets[b].xCoord,
       allBullets[b].yCoord, 
       widthOfBullet, 
@@ -194,7 +197,6 @@ void shootFromShip() {
   if(!spaceShipBullet.isReadyToShoot) {
     return;
   }
-  drawShipBullet(Black);
   spaceShipBullet.isReadyToShoot = false;
   spaceShipBullet.xCoord = spaceShip.xCoord + shipWidth / 2;
   spaceShipBullet.yCoord = spaceShip.yCoord + heightOfBullet; 
@@ -212,25 +214,23 @@ void moveShipBullets() {
   }
   previousMillisForMovingShipBullet = currentMillis;
 
-  if(!spaceShipBullet.isReadyToShoot) {
-    drawShipBullet(Black);
-    if(spaceShipBullet.yCoord >= gridYLimit) {
-      spaceShipBullet.isReadyToShoot = true;
-      return;
-    }       
-    spaceShipBullet.yCoord += 1;
-    drawShipBullet(Red);
-  }
+  drawShipBullet(Black);
+  if(spaceShipBullet.yCoord >= gridYLimit) {
+    spaceShipBullet.isReadyToShoot = true;
+    return;
+  }       
+  spaceShipBullet.yCoord += 1;
+  drawShipBullet(Red);
 }
 
 void checkCollisionWithMonsters() {
   if (spaceShipBullet.isReadyToShoot) {
-    return false;
-  } else if (spaceShipBullet.yCoord >= gridYLimit){
+    return;
+  } else if (spaceShipBullet.yCoord - heightOfBullet >= gridYLimit){
     return;
   }
-  for (int r = 0; r<rows; r++) {
-    for (int c = 0; c<columns; c++) {
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < columns; c++) {
       if (allMonsters[r][c].isDeleted) {
         continue;
       }
@@ -348,9 +348,9 @@ void monstersShoot() {
   intervalForShooting = random(500UL, 1000UL);
   previousMillisForShooting = currentMillis;
   for(int b = 0; b < columns - columnsDestroyed; b++) { //instead going through
-                                                       //all bullets, go just as
-                                                       //much as there's columns
-                                                       //left
+                                                        //all bullets, go just as
+                                                        //much as there's columns
+                                                        //left
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
       allBullets[b].isReadyToShoot = false;
       shootRandomly(b);
