@@ -3,7 +3,7 @@ int buttonPinBlue = A1;
 int buttonPinRed = A2;
 int buttonPinGreen = A4;
 int buttonPinYellow = A3;
-bool powerOn = true;
+bool isGameOver = false;
 
 #include "ScreenDriver.h"
 #include "Display.h"
@@ -17,7 +17,7 @@ unsigned long previousMillisForMovingBullets = 0UL;
 unsigned long previousMillisForMovingShipBullet = 0UL;
 unsigned long previousMillisForMovingShip = 0UL;
 unsigned long intervalForShooting = random(500UL, 1000UL);
-unsigned long interval = 1600UL; // Is here because when monsters speed up, 
+unsigned long interval = 800UL; // Is here because when monsters speed up, 
                                  // this value changes 
 int columnsDestroyed = 0;
 unsigned long secPassed = 0; //declare globally in case of restarting the game
@@ -92,10 +92,9 @@ void setup() {
 }
 
 void loop() { 
-  if(!powerOn) {
+  if(isGameOver) {
     if(digitalRead(buttonPinGreen) == LOW) {
       restartGame();
-      powerOn = true;
     } else if (digitalRead(buttonPinYellow) == LOW) {
       quit();
     } 
@@ -103,22 +102,22 @@ void loop() {
   } 
 
   if(columnsDestroyed == columns) {
-    int bonusPointsForSpeed = (rows * columns * 20 - 
-        (millis() / 1000 - secPassed)) / 10 * 2; // BUG: when negative value, 
-                                                 //show a random number (13122)
-    Serial.println(millis() / 1000);
-    Serial.println(bonusPointsForSpeed);
+    int bonusTime = rows * columns * 20 
+      < millis() / 1000 - secPassed
+      ? 0
+      :  rows * columns * 20 - (millis() / 1000 - secPassed); 
+    int bonusPointsForSpeed = bonusTime / 10 * 2;
     drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
     drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
         0);
-    powerOn = false;
+    isGameOver = true;
     return;
   }
 
   drawStats(gamesStats.score, gamesStats.lifes);
   if(gamesStats.lifes == 0) {
     drawLoserText();
-    powerOn = false;
+    isGameOver = true;
     return;
   }
 
@@ -126,7 +125,7 @@ void loop() {
   moveShipBullets();
   moveMonsters();
   checkCollisionWithMonsters();
-  //checkCollisionWithShip();
+  checkCollisionWithShip();
   monstersBulletsMove();
   monstersShoot();
   drawShip(White); 
@@ -173,9 +172,6 @@ void drawShip(int colour) {
 }
 
 void drawMonstersBullet(int b, int colour) {
-  if (allBullets[b].isReadyToShoot) {
-    return;
-  }
   drawFigure(allBullets[b].xCoord,
       allBullets[b].yCoord, 
       widthOfBullet, 
@@ -310,9 +306,9 @@ void moveMonsters() {
   }
   if(intervalForSpeedingUp <
       currentMillis - previousMillisForSpeedingUp
-      && interval >= 200UL
+      && interval >= 100UL
     ) { 
-    interval -= 200UL;
+    interval -= 100UL;
     previousMillisForSpeedingUp = currentMillis;
   }
 
@@ -501,7 +497,7 @@ void restartGame() {
   previousMillisForMovingShipBullet = 0UL;
   previousMillisForMovingShip = 0UL;
   intervalForShooting = random(500UL, 1000UL);
-  interval = 1600UL;
+  interval = 800UL;
   secPassed = millis() / 1000;
 
   columnsDestroyed = 0;
@@ -510,7 +506,7 @@ void restartGame() {
   spaceShipBullet = {0, 0, true};
   spaceShip.isInvulnerable = false;
   spaceShip.xCoord = spaceShipX;
-  powerOn = true;
+  isGameOver = false;
   monstersMovingDirection = 'R';
 
   createBulletsForMonsters();
@@ -519,6 +515,6 @@ void restartGame() {
 
 void quit() {
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
-  powerOn = false;
+  isGameOver = true;
 }
 
