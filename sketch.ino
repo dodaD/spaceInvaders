@@ -17,7 +17,7 @@ unsigned long previousMillisForMovingBullets = 0UL;
 unsigned long previousMillisForMovingShipBullet = 0UL;
 unsigned long previousMillisForMovingShip = 0UL;
 unsigned long intervalForShooting = random(500UL, 1000UL);
-unsigned long interval = 800UL; // Is here because when monsters speed up, 
+unsigned long interval = originalSpeed; // Is here because when monsters speed up, 
                                  // this value changes 
 int columnsDestroyed = 0;
 unsigned long secPassed = 0; //declare globally in case of restarting the game
@@ -94,7 +94,7 @@ void setup() {
 void loop() { 
   if(isGameOver) {
     if(digitalRead(buttonPinGreen) == LOW) {
-      restartGame();
+      restartGame(); 
     } else if (digitalRead(buttonPinYellow) == LOW) {
       quit();
     } 
@@ -102,11 +102,8 @@ void loop() {
   } 
 
   if(columnsDestroyed == columns) {
-    int bonusTime = rows * columns * 20 
-      < millis() / 1000 - secPassed
-      ? 0
-      :  rows * columns * 20 - (millis() / 1000 - secPassed); 
-    int bonusPointsForSpeed = bonusTime / 10 * 2;
+    int bonusPointsForSpeed = (rows * columns * 20 - 
+        (millis() / 1000 - secPassed)) / 10 * 2;
     drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
     drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
         0);
@@ -114,7 +111,6 @@ void loop() {
     return;
   }
 
-  drawStats(gamesStats.score, gamesStats.lifes);
   if(gamesStats.lifes == 0) {
     drawLoserText();
     isGameOver = true;
@@ -306,9 +302,9 @@ void moveMonsters() {
   }
   if(intervalForSpeedingUp <
       currentMillis - previousMillisForSpeedingUp
-      && interval >= 100UL
+      && interval >= speedDecerease
     ) { 
-    interval -= 100UL;
+    interval -= speedDecerease;
     previousMillisForSpeedingUp = currentMillis;
   }
 
@@ -497,13 +493,13 @@ void restartGame() {
   previousMillisForMovingShipBullet = 0UL;
   previousMillisForMovingShip = 0UL;
   intervalForShooting = random(500UL, 1000UL);
-  interval = 800UL;
+  interval = originalSpeed;
   secPassed = millis() / 1000;
 
   columnsDestroyed = 0;
   gamesStats.lifes = 3;
   gamesStats.score = 0;
-  spaceShipBullet = {0, 0, true};
+  spaceShipBullet.isReadyToShoot = true;
   spaceShip.isInvulnerable = false;
   spaceShip.xCoord = spaceShipX;
   isGameOver = false;

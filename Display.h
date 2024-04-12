@@ -148,12 +148,12 @@ void drawWinningText(int bonusPointsForSpeed, int bonusPointsForLivesLeft) {
   ER5517.Goto_Text_XY((gridXLimit / 2 - 10) * multiplier, 
                       (gridYLimit * multiplier) / 2 - 30);
   ER5517.Show_String("You won!");
-  char newBonusPointsForSpeed[3];
+  char newBonusPointsForSpeed[8];
   char newBonusPointsForLivesLeft[3];
 
   String tempBonusPointsForSpeed = String(bonusPointsForSpeed);
   String tempBonusPointsForLivesLeft = String(bonusPointsForLivesLeft);
-  tempBonusPointsForSpeed.toCharArray(newBonusPointsForSpeed, 3); 
+  tempBonusPointsForSpeed.toCharArray(newBonusPointsForSpeed, 8); 
   tempBonusPointsForLivesLeft.toCharArray(newBonusPointsForLivesLeft, 3); 
   char* pointerToBonusPointsForSpeed = newBonusPointsForSpeed;
   char* pointerToBonusPointsForLivesLeft = newBonusPointsForLivesLeft;

@@ -26,6 +26,8 @@
 #define columns 1
 #define maxRows ((gridYLimit - spaceShipY) / (sideOfMonster + rowGap))
 #define maxColumns ((gridXLimit + columnGap) / (sideOfMonster + columnGap))
+#define speedDecerease 100UL
+#define originalSpeed 800UL
 
 #if rows > maxRows
 #error tooManyRows Rows must be less than or equal to maxRows
