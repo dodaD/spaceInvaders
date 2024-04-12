@@ -170,4 +170,24 @@ void drawWinningText(int bonusPointsForSpeed, int bonusPointsForLivesLeft) {
   ER5517.Show_String(pointerToBonusPointsForLivesLeft);
 }
 
+void drawMonsterA (int x, int y) {
+  int newX = adjustCoordX(x);
+  int newY = adjustCoordY(y);
+  ER5517.DrawSquare_Fill(newX + 2 * 3,
+                         newY,
+                         (newX + 2 * 3) + 4 * 3,
+                         newY + 1 * 3,
+                         White);
+  ER5517.DrawSquare_Fill(newX + 1 * 3,
+                         newY + 1 * 3,
+                         (newX + 1 * 3) + 6 * 3,
+                         newY + 2 * 3,
+                         White);
+  ER5517.DrawSquare_Fill(newX,
+                         newY + 2 * 3,
+                         newX + 8 * 3,
+                         newY + 4 * 3,
+                         White);
+}
+
 #endif
