@@ -89,57 +89,35 @@ void setup() {
   createBulletsForMonsters();
   drawGrid();
   //Serial.println(startPositionX);
+  drawFigure(
+      40,
+      40,
+      sideOfMonster,
+      sideOfMonster,
+      Red
+  );
+  drawMonsterA(40, 40, 'O');
 }
 
 void loop() {
-  if(isGameOver) {
-    if(digitalRead(buttonPinGreen) == LOW) {
-      restartGame(); 
-    } else if (digitalRead(buttonPinYellow) == LOW) {
-      quit();
-    } 
-    return;
-  } 
-
-  if(columnsDestroyed == columns) {
-    int bonusPointsForSpeed = rows * columns * 20 - 
-      (millis() / 1000 - secPassed);
-    if(bonusPointsForSpeed < 0 ) {
-      bonusPointsForSpeed = 0;
-    }
-    drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
-    drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
-        0);
-    isGameOver = true;
-    return;
-  }
-
-  if(gamesStats.lifes == 0) {
-    drawLoserText();
-    isGameOver = true;
-    return;
-  }
-
-  drawGrid();
-  moveShipBullets();
-  moveMonsters();
-  checkCollisionWithMonsters();
-  checkCollisionWithShip();
-  monstersBulletsMove();
-  monstersShoot();
-  drawShip(White); 
-
-  if (digitalRead(buttonPinBlack) == LOW){
-    moveShip('L');
-  }
-
-  if (digitalRead(buttonPinBlue) == LOW){
-    moveShip('R');
-  }
-
-  if (digitalRead(buttonPinRed) == LOW){
-    shootFromShip();
-  }
+   drawFigure(
+      40,
+      40,
+      sideOfMonster,
+      sideOfMonster,
+      Black
+  );
+  drawMonsterA(40, 40, 'C');
+  delay(1000);
+     drawFigure(
+      40,
+      40,
+      sideOfMonster,
+      sideOfMonster,
+      Black
+  );
+  drawMonsterA(40, 40, 'O');
+  delay(1000);
 }
 
 void drawMonster(int r, int c, int colour) {

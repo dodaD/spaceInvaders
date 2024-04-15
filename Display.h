@@ -8,7 +8,10 @@
 // #define LCD_YSIZE_TFT    480
 
 int multiplier = 6;
-int previousAmountOfLives = 0; //To optimize re-drawing of ships that symbolize lifes left
+int previousAmountOfLives = 0; //To optimize re-drawing of ships
+                              //that symbolize lifes left
+int maxWidth = 10; // Max width when drawing a monster
+int onePx = (sideOfMonster * multiplier) / maxWidth; 
 
 int adjustCoordX(float oldXCoord) {
   float newXCoord = oldXCoord * multiplier;
@@ -170,23 +173,90 @@ void drawWinningText(int bonusPointsForSpeed, int bonusPointsForLivesLeft) {
   ER5517.Show_String(pointerToBonusPointsForLivesLeft);
 }
 
-void drawMonsterA (int x, int y) {
-  int newX = adjustCoordX(x);
+void drawMonsterA (int x, int y, char typeOfAnimation) {
+  int newX = adjustCoordX(x); //Start of widest part
   int newY = adjustCoordY(y);
-  ER5517.DrawSquare_Fill(newX + 2 * 3,
+
+  ER5517.DrawSquare_Fill(newX + (onePx * 3), //Marging from the widest part
                          newY,
-                         (newX + 2 * 3) + 4 * 3,
-                         newY + 1 * 3,
+                         (newX + (onePx * 3)) + (onePx * 4), //Start + width
+                         newY + onePx, //Start + height
                          White);
-  ER5517.DrawSquare_Fill(newX + 1 * 3,
-                         newY + 1 * 3,
-                         (newX + 1 * 3) + 6 * 3,
-                         newY + 2 * 3,
+
+
+  ER5517.DrawSquare_Fill(newX + (onePx * 1),
+                         newY + onePx,
+                         (newX + (onePx * 1)) + (onePx * 8),
+                         newY + onePx * 2,
                          White);
+
   ER5517.DrawSquare_Fill(newX,
-                         newY + 2 * 3,
-                         newX + 8 * 3,
-                         newY + 4 * 3,
+                         newY + onePx * 2,
+                         newX + (onePx * maxWidth),
+                         newY + onePx * 6,
+                         White);
+
+  ER5517.DrawSquare_Fill(newX + onePx * 1,
+                         newY + onePx * 4,
+                         (newX + onePx * 1) + onePx * 3,
+                         newY + onePx * 5,
+                         Black);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                         newY + onePx * 4,
+                         (newX + onePx * (maxWidth - 4)) + onePx * 3,
+                         newY + onePx * 5,
+                         Black);
+
+
+  ER5517.DrawSquare_Fill(newX + onePx * 1,
+                         newY + onePx * 6,
+                         (newX + onePx * 1) + (onePx * 2),
+                         newY + onePx * 7, 
+                         White);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
+                         newY + onePx * 6,
+                         (newX + onePx * (maxWidth - 3)) + (onePx * 2),
+                         newY + onePx * 7,
+                         White);
+
+  if(typeOfAnimation == 'O') {
+    ER5517.DrawSquare_Fill(newX,
+                           newY + onePx * 7,
+                           newX + (onePx * 2),
+                           newY + onePx * 8,
+                           White);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 2),
+                           newY + onePx * 7,
+                           (newX + onePx * (maxWidth - 2)) + (onePx * 2),
+                           newY + onePx * 8,
+                           White);
+  } else {
+    ER5517.DrawSquare_Fill(newX + onePx * 2,
+                           newY + onePx * 7,
+                           (newX + onePx * 2) + (onePx * 2),
+                           newY + onePx * 8,
+                           White);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                           newY + onePx * 7,
+                           (newX + onePx * (maxWidth - 4)) + (onePx * 2),
+                           newY + onePx * 8,
+                           White);
+  }
+
+  ER5517.DrawSquare_Fill(newX + onePx * 1,
+                         newY + onePx * 8,
+                         (newX + onePx * 1) + (onePx * 2),
+                         newY + onePx * 9, 
+                         White);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
+                         newY + onePx * 8,
+                         (newX + onePx * (maxWidth - 3)) + (onePx * 2),
+                         newY + onePx * 9,
                          White);
 }
 
