@@ -91,52 +91,60 @@ void setup() {
   //Serial.println(startPositionX);
 }
 
-void loop() { 
-  if(isGameOver) {
-    if(digitalRead(buttonPinGreen) == LOW) {
-      restartGame(); 
-    } else if (digitalRead(buttonPinYellow) == LOW) {
-      quit();
-    } 
-    return;
-  } 
-
-  if(columnsDestroyed == columns) {
-    int bonusPointsForSpeed = (rows * columns * 20 - 
-        (millis() / 1000 - secPassed)) / 10 * 2;
-    drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
-    drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
-        0);
-    isGameOver = true;
-    return;
-  }
-
-  if(gamesStats.lifes == 0) {
-    drawLoserText();
-    isGameOver = true;
-    return;
-  }
-
-  drawGrid();
-  moveShipBullets();
-  moveMonsters();
-  checkCollisionWithMonsters();
-  checkCollisionWithShip();
-  monstersBulletsMove();
-  monstersShoot();
-  drawShip(White); 
-
-  if (digitalRead(buttonPinBlack) == LOW){
-    moveShip('L');
-  }
-
-  if (digitalRead(buttonPinBlue) == LOW){
-    moveShip('R');
-  }
-
-  if (digitalRead(buttonPinRed) == LOW){
-    shootFromShip();
-  }
+void loop() {
+  delay(10000);
+  int bonusPointsForSpeed = (rows * columns * 20 - 
+      (millis() / 1000)); //Not a problem since it forces UL into int
+  unsigned long a = -1;
+  int b = a  * 2;
+  int c = a  / 10 * 2;
+  Serial.println(b);
+  Serial.println(bonusPointsForSpeed);
+  // Conclusion: if millis() / 1000 is negative, then adding smaller number 
+  // to it will cause of overflow of int, unless I put millis() in int first(idk)
+  //
+  // Update:
+  // (1 * 1 * 20 - millis()) / 10 * 2 - simplified version
+  // so, in that case when millis is larger than 20 it larger in number of times,
+  // therefore when divided by 10 and multiplied by 2 it doesn't reduce the number,
+  // but instead it's overflowing and giving weird result
+  //
+  // Update 2:
+  // problem is actually is only when we divide by 10; then we get a big number
+  // and when we double it it simply overflows the int value
+  //
+  // Update 3:
+  // What happens is multiplision happens first and it divides not by 10, but 
+  // by 20 which gives half of big number when we divide by 10 
+  //
+  // Example:
+  // Divided by 20 every ten sec:
+  // 0
+  // -13108
+  // -13108
+  // -13109
+  // -13109
+  //
+  // Divided by 10 * 2 every ten sec:
+  // 0
+  // 13106
+  // 13104
+  // 13102
+  // 13100
+  //
+  // Update 4:
+  // It's the closest when divided by 5. Previous theory was wrong
+  // 1 
+  // 13107 
+  // 13105 
+  // 13103
+  // 13101
+  //
+  // Update 5: 
+  // My theory is that after calcultaing 20 - millis() / 1000, it treats it as 
+  // un unsigned long, which cannot hold negative value. So whenever we trying 
+  // to divide it it gives a weird results.
+  // Weird thing is when we multiplying it treats UL as int
 }
 
 void drawMonster(int r, int c, int colour) {
