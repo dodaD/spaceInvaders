@@ -260,4 +260,170 @@ void drawMonsterA (int x, int y, char typeOfAnimation) {
                          White);
 }
 
+void drawMonsterBBase (int x, int y, int color) { 
+  int newX = adjustCoordX(x);
+  int newY = adjustCoordY(y);  
+
+  ER5517.DrawSquare_Fill(newX + onePx,
+                         newY,
+                         (newX + onePx) + onePx,
+                         newY + onePx,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 2),
+                         newY,
+                         (newX + onePx * (maxWidth - 2)) + onePx,
+                         newY + onePx,
+                         color); 
+
+  ER5517.DrawSquare_Fill(newX + onePx * 2,
+                         newY + onePx,
+                         (newX + onePx * 2) + onePx,
+                         newY + onePx * 2,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
+                         newY + onePx,
+                         (newX + onePx * (maxWidth - 3)) + onePx,
+                         newY + onePx * 2,
+                         color); 
+
+  ER5517.DrawSquare_Fill(newX + onePx * 3,
+                         newY + onePx * 2,
+                         (newX + onePx * 3) + onePx,
+                         newY + onePx * 3,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                         newY + onePx * 2,
+                         (newX + onePx * (maxWidth - 4)) + onePx,
+                         newY + onePx * 3,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * 3,
+                         newY + onePx * 3,
+                         (newX + onePx * 3) + onePx * 4,
+                         newY + onePx * 4,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * 2,
+                         newY + onePx * 4,
+                         (newX + onePx * 2) + onePx * 6,
+                         newY + onePx * 5,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx,
+                         newY + onePx * 5,
+                         (newX + onePx) + onePx * 8,
+                         newY + onePx * 7,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * 2,
+                           newY + onePx * 7,
+                           newX + onePx * (maxWidth - 2),
+                           newY + onePx * 8,
+                           color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * 3,
+                         newY + onePx * 5,
+                         (newX + onePx * 3) + onePx * 1,
+                         newY + onePx * 6,
+                         Black);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                         newY + onePx * 5,
+                         (newX + onePx * (maxWidth - 4)) + onePx * 1,
+                         newY + onePx * 6,
+                         Black);
+}
+
+
+
+void drawMonsterBAnimated (int x, int y, int color, char typeOfAnimation) { 
+  int newX = adjustCoordX(x);
+  int newY = adjustCoordY(y);
+  if (typeOfAnimation == 'C') {
+    if (color != Black) {
+      drawMonsterBAnimated (x, y, Black, 'O');
+    }
+
+    ER5517.DrawSquare_Fill(newX,
+                           newY + onePx * 6,
+                           newX + onePx,
+                           newY + onePx * 9,
+                           color);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 1),
+                           newY + onePx * 6,
+                           (newX + onePx * (maxWidth - 1)) + onePx,
+                           newY + onePx * 9,
+                           color);
+
+    ER5517.DrawSquare_Fill(newX + onePx * 2,
+                           newY + onePx * 8,
+                           (newX + onePx * 2) + onePx,
+                           newY + onePx * 9,
+                           color);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
+                           newY + onePx * 8,
+                           (newX + onePx * (maxWidth - 3)) + onePx,
+                           newY + onePx * 9,
+                           color);
+
+    ER5517.DrawSquare_Fill(newX + onePx * 3,
+                           newY + onePx * 9,
+                           (newX + onePx * 3) + onePx,
+                           newY + onePx * 10,
+                           color);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                           newY + onePx * 9,
+                           (newX + onePx * (maxWidth - 4)) + onePx,
+                           newY + onePx * 10,
+                           color);
+    return;
+  }
+
+  if (color != Black) {
+    drawMonsterBAnimated (x, y, Black, 'C');
+  }
+
+  ER5517.DrawSquare_Fill(newX,
+                         newY + onePx * 3,
+                         newX + onePx,
+                         newY + onePx * 6,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 1),
+                         newY + onePx * 3,
+                         (newX + onePx * (maxWidth - 1)) + onePx,
+                         newY + onePx * 6,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * 2,
+                         newY + onePx * 8,
+                         (newX + onePx * 2) + onePx,
+                         newY + onePx * 9,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
+                         newY + onePx * 8,
+                         (newX + onePx * (maxWidth - 3)) + onePx,
+                         newY + onePx * 9,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx,
+                         newY + onePx * 9,
+                         (newX + onePx) + onePx,
+                         newY + onePx * 10,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 2),
+                         newY + onePx * 9,
+                         (newX + onePx * (maxWidth - 2)) + onePx,
+                         newY + onePx * 10,
+                         color);
+  }
+
 #endif
