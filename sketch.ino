@@ -31,10 +31,12 @@ Ship spaceShip = {spaceShipX, spaceShipY, false};
 
 int monstersColumns[columns];
 char monstersMovingDirection = 'R';
+char monstersAnimationPhase = 'O';
 typedef struct {
   int xCoord;
   int yCoord;
   bool isDeleted;
+  int typeOfMonster;
 } Monster;
 Monster allMonsters[rows][columns];
 
@@ -87,47 +89,70 @@ void setup() {
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   createMonsters();
   createBulletsForMonsters();
-  drawGrid();
+ // drawGrid();
   //Serial.println(startPositionX);
-  drawFigure(
-      40,
-      40,
-      sideOfMonster,
-      sideOfMonster,
-      Red
-  );
-  drawMonsterA(40, 40, 'O');
 }
 
 void loop() {
-   drawFigure(
-      40,
-      40,
-      sideOfMonster,
-      sideOfMonster,
-      Black
-  );
-  drawMonsterA(40, 40, 'C');
-  delay(1000);
-     drawFigure(
-      40,
-      40,
-      sideOfMonster,
-      sideOfMonster,
-      Black
-  );
-  drawMonsterA(40, 40, 'O');
-  delay(1000);
+  if(isGameOver) {
+    if(digitalRead(buttonPinGreen) == LOW) {
+      restartGame();
+    } else if (digitalRead(buttonPinYellow) == LOW) {
+      quit();
+    } 
+    return;
+  } 
+
+  if(columnsDestroyed == columns) {
+    int bonusTime = rows * columns * 20 
+      < millis() / 1000 - secPassed
+      ? 0
+      :  rows * columns * 20 - (millis() / 1000 - secPassed); 
+    int bonusPointsForSpeed = bonusTime / 10 * 2;
+    drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
+    drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
+        0);
+    isGameOver = true;
+    return;
+  }
+
+  drawStats(gamesStats.score, gamesStats.lifes);
+  if(gamesStats.lifes == 0) {
+    drawLoserText();
+    isGameOver = true;
+    return;
+  }
+
+  //drawGrid();
+  moveShipBullets();
+  moveMonsters();
+  checkCollisionWithMonsters();
+  checkCollisionWithShip();
+  monstersBulletsMove();
+  monstersShoot();
+  drawShip(White); 
+
+  if (digitalRead(buttonPinBlack) == LOW){
+    moveShip('L');
+  }
+
+  if (digitalRead(buttonPinBlue) == LOW){
+    moveShip('R');
+  }
+
+  if (digitalRead(buttonPinRed) == LOW){
+    shootFromShip();
+  }
+
 }
 
 void drawMonster(int r, int c, int colour) {
-  drawFigure(
-      allMonsters[r][c].xCoord,
-      allMonsters[r][c].yCoord,
-      sideOfMonster,
-      sideOfMonster,
-      colour
-      );
+    drawFigure(allMonsters[r][c].xCoord,
+        allMonsters[r][c].yCoord, 
+        sideOfMonster, 
+        sideOfMonster, 
+        colour
+        );
 }
 
 void drawShip(int colour) {
@@ -258,21 +283,32 @@ void moveShip(char direction) {
 }
 
 void createMonsters() {
+  int typesOfMonsters = 3;
+  int currentMonsterType = 0;
+  int amountOfRowsWithTheSameType = rows / typesOfMonsters;
+
   for (int c = 0; c < columns; c++) {
     monstersColumns[c] = rows;
   }
 
   for (int r = 0; r < rows; r++) {
+    if(r % amountOfRowsWithTheSameType == 0 &&
+        currentMonsterType < typesOfMonsters
+      ) {
+      currentMonsterType++;
+    }
+
     for (int c = 0; c < columns; c++) {
       int positionX = startPositionX + c * sideOfMonster + columnGap * c;
       int positionY = startPositionY - r * sideOfMonster - rowGap * r;
 
       allMonsters[r][c].xCoord = positionX;
       allMonsters[r][c].yCoord = positionY;
+      allMonsters[r][c].typeOfMonster = currentMonsterType;
       allMonsters[r][c].isDeleted = false;
       drawMonster(r, c, White);
     }
-  }
+  }    
 }
 
 void moveMonsters() {
@@ -313,43 +349,63 @@ void createBulletsForMonsters() {
   }
 }
 
-void monstersShoot() {
+void monstersShoot() { 
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForShooting < intervalForShooting) {
     return;
   }
-  intervalForShooting = random(500UL, 1000UL);
+
+  if(columnsDestroyed >= maxBullets) {
+    return;
+  }
+
+  int columnsThatHadBullet[maxBullets - columnsDestroyed]; 
+  
+  intervalForShooting = random(500UL, 1000UL); // TODO: discus randomizer logic
   previousMillisForShooting = currentMillis;
-  for(int b = 0; b < columns - columnsDestroyed; b++) { //instead going through
+  for(int b = 0; b < maxBullets - columnsDestroyed; b++) { //instead going through
                                                         //all bullets, go just as
                                                         //much as there's columns
                                                         //left
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
+      int column = chooseRandomColumn();
+      for(int i = b - 1; i >= 0; i--) {
+        if(columnsThatHadBullet[i] == column) {
+          column = chooseRandomColumn();
+          i = b - 1;
+        }
+        columnsThatHadBullet[i] = column;
+      }
+      int row = chooseRow(column);
+
       allBullets[b].isReadyToShoot = false;
-      shootRandomly(b);
+      allBullets[b].xCoord = allMonsters[row][column].xCoord + sideOfMonster / 2;
+      allBullets[b].yCoord =  allMonsters[row][column].yCoord - sideOfMonster;
+      drawMonstersBullet(b, Green);
       continue;
     }
   }
 }
 
-void shootRandomly(int b) {
+int chooseRandomColumn() {
   int column = rand() % columns;
-  int row = 0;
   if(monstersColumns[column] == 0) {
-    return shootRandomly(b);
+    return chooseRandomColumn();
   }
+  return column;
+}
 
-  for ( int r = rows - 1; r >= 0; r-- ) {
+int chooseRow(int column) {
+  int row = 0;
+  for (int r = rows - 1; r >= 0; r--) {
     if(allMonsters[r][column].isDeleted == false) {
       row = r;
       break;
     }
   }
-
-  allBullets[b].xCoord = allMonsters[row][column].xCoord + sideOfMonster / 2;
-  allBullets[b].yCoord =  allMonsters[row][column].yCoord - sideOfMonster;
-  drawMonstersBullet(b, Green);
+  return row;
 }
+
 
 void monstersBulletsMove() {
   unsigned long currentMillis = millis();

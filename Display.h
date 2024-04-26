@@ -173,7 +173,7 @@ void drawWinningText(int bonusPointsForSpeed, int bonusPointsForLivesLeft) {
   ER5517.Show_String(pointerToBonusPointsForLivesLeft);
 }
 
-void drawMonsterABase (int x, int y, int color) {
+void drawMonster1Base (int x, int y, int color) {
   int newX = adjustCoordX(x); //Start of widest part
   int newY = adjustCoordY(y);
 
@@ -238,13 +238,13 @@ void drawMonsterABase (int x, int y, int color) {
                          color);
 }
 
-void drawMonsterAAnimation (int x, int y, int color, char typeOfAnimation) {
+void drawMonster1Animation (int x, int y, int color, char typeOfAnimation) {
   int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);  
 
   if(typeOfAnimation == 'C') { 
     if (color != Black) {
-      drawMonsterAAnimation(x, y, Black, 'O');
+      drawMonster1Animation(x, y, Black, 'O');
     }
 
     ER5517.DrawSquare_Fill(newX,
@@ -262,7 +262,7 @@ void drawMonsterAAnimation (int x, int y, int color, char typeOfAnimation) {
   } 
 
   if (color != Black) {
-    drawMonsterAAnimation(x, y, Black, 'C');
+    drawMonster1Animation(x, y, Black, 'C');
   }
   ER5517.DrawSquare_Fill(newX + onePx * 2,
                          newY + onePx * 8,
@@ -278,7 +278,7 @@ void drawMonsterAAnimation (int x, int y, int color, char typeOfAnimation) {
 
 }
 
-void drawMonsterBBase (int x, int y, int color) { 
+void drawMonster2Base (int x, int y, int color) { 
   int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);  
 
@@ -357,12 +357,12 @@ void drawMonsterBBase (int x, int y, int color) {
 
 
 
-void drawMonsterBAnimation (int x, int y, int color, char typeOfAnimation) { 
+void drawMonster2Animation (int x, int y, int color, char typeOfAnimation) { 
   int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);
   if (typeOfAnimation == 'C') {
     if (color != Black) {
-      drawMonsterBAnimation(x, y, Black, 'O');
+      drawMonster2Animation(x, y, Black, 'O');
     }
 
     ER5517.DrawSquare_Fill(newX,
@@ -404,7 +404,7 @@ void drawMonsterBAnimation (int x, int y, int color, char typeOfAnimation) {
   }
 
   if (color != Black) {
-    drawMonsterBAnimation(x, y, Black, 'C');
+    drawMonster2Animation(x, y, Black, 'C');
   }
 
   ER5517.DrawSquare_Fill(newX,
@@ -444,7 +444,7 @@ void drawMonsterBAnimation (int x, int y, int color, char typeOfAnimation) {
                          color);
 }
 
-void drawMonsterCBase (int x, int y, int color) {
+void drawMonster3Base (int x, int y, int color) {
   int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);
 
@@ -491,12 +491,12 @@ void drawMonsterCBase (int x, int y, int color) {
                          Black);
 }
 
-void drawMonsterCAnimation (int x, int y, int color, char typeOfAnimation) { 
+void drawMonster3Animation (int x, int y, int color, char typeOfAnimation) { 
   int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);
   if (typeOfAnimation == 'C') {
     if (color != Black) {
-      drawMonsterCAnimation(x, y, Black, 'O');
+      drawMonster3Animation(x, y, Black, 'O');
     }
     ER5517.DrawSquare_Fill(newX + onePx * 2,
                            newY + onePx * 7,
@@ -542,7 +542,7 @@ void drawMonsterCAnimation (int x, int y, int color, char typeOfAnimation) {
     return;
   }
   if (color != Black) {
-    drawMonsterCAnimation(x, y, Black, 'C');
+    drawMonster3Animation(x, y, Black, 'C');
   }
   ER5517.DrawSquare_Fill(newX + onePx * 3,
                          newY + onePx * 7,
