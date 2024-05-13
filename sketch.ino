@@ -6,8 +6,8 @@ int buttonPinYellow = A3;
 bool isGameOver = false;
 
 #include "ScreenDriver.h"
-#include "Display.h"
-#include "Constants.h"
+#include "Display.h" // WARNING: !!!!!!!!
+#include "Constants.h" 
 
 unsigned long previousMillisForMoving = 0UL;
 unsigned long previousMillisForInvulnerability = 0UL;
@@ -53,7 +53,7 @@ typedef struct {
 
 Stats gamesStats = {0, 3};
 Bullet spaceShipBullet = {0, 0, true}; 
-const int maxBullets = 7 > columns * rows ? columns * rows : 7;
+const int maxBullets = 7 > columns ? columns : 7;
 Bullet allBullets[maxBullets];
 
 void setup() {  
@@ -94,7 +94,7 @@ void setup() {
 }
 
 void loop() {
-  if(isGameOver) {
+if(isGameOver) {
     if(digitalRead(buttonPinGreen) == LOW) {
       restartGame();
     } else if (digitalRead(buttonPinYellow) == LOW) {
@@ -359,7 +359,7 @@ void monstersShoot() {
     return;
   }
 
-  int columnsThatHadBullet[maxBullets - columnsDestroyed]; 
+  int columnsThatHadBullet[maxBullets - columnsDestroyed];
   
   intervalForShooting = random(500UL, 1000UL); // TODO: discus randomizer logic
   previousMillisForShooting = currentMillis;
@@ -368,14 +368,9 @@ void monstersShoot() {
                                                         //much as there's columns
                                                         //left
     if(allBullets[b].isReadyToShoot && rand() % 100 > 50 ) {
-      int column = chooseRandomColumn();
-      for(int i = b - 1; i >= 0; i--) {
-        if(columnsThatHadBullet[i] == column) {
-          column = chooseRandomColumn();
-          i = b - 1;
-        }
-        columnsThatHadBullet[i] = column;
-      }
+      int column = chooseRandomColumn(columnsThatHadBullet, 
+          (maxBullets - columnsDestroyed));
+      columnsThatHadBullet[b] = column;
       int row = chooseRow(column);
 
       allBullets[b].isReadyToShoot = false;
@@ -387,11 +382,16 @@ void monstersShoot() {
   }
 }
 
-int chooseRandomColumn() {
+int chooseRandomColumn(int arr[], int sizeOfArr) {
   int column = rand() % columns;
-  if(monstersColumns[column] == 0) {
-    return chooseRandomColumn();
+  if (monstersColumns[column] == 0) {
+    return chooseRandomColumn(arr, sizeOfArr);
   }
+  for (int i = 0; i < sizeOfArr; i++) {
+      if (column == arr[i]) {
+        return chooseRandomColumn(arr, sizeOfArr);
+        }
+    }
   return column;
 }
 
@@ -507,7 +507,6 @@ void lowerMonsters() {
         gamesStats.lifes = 0;
         return;
       }
-
       drawFigure(
           allMonsters[r][c].xCoord,
           allMonsters[r][c].yCoord,
