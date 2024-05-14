@@ -174,7 +174,15 @@ void drawWinningText(int bonusPointsForSpeed, int bonusPointsForLivesLeft) {
 }
 
 void drawMonster1Base (int x, int y, int color) {
-  int newX = adjustCoordX(x); 
+  if (x > gridXLimit
+    || y > gridYLimit
+    || x <  0 - sideOfMonster
+    || y < sideOfMonster
+  ) {
+    return;
+  }
+
+  int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);
 
   ER5517.DrawSquare_Fill(newX + (onePx * 4),
@@ -229,10 +237,13 @@ void drawMonster1Base (int x, int y, int color) {
 }
 
 void reDrawMonster1(int x, int y, char movementDirection) {
-  int newX = adjustCoordX(x); 
+  int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);
   int onePxThatNeedsToBeReDrawn = moveDistanceForMonsters * multiplier;
   int startPointX = newX + (onePx * 4);
+  if(newX < onePxThatNeedsToBeReDrawn) {
+    newX = onePxThatNeedsToBeReDrawn;
+  }
 
   if (movementDirection == 'R') {
     ER5517.DrawSquare_Fill(startPointX,
@@ -293,7 +304,6 @@ void reDrawMonster1(int x, int y, char movementDirection) {
   }
 
   if (movementDirection == 'L') {
-
     ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
                            newY,
                            startPointX,
@@ -349,6 +359,7 @@ void reDrawMonster1(int x, int y, char movementDirection) {
                            newY + onePx * 7,
                            Black);
     return;
+
 
   }
 
