@@ -233,132 +233,119 @@ void reDrawMonster1(int x, int y, char movementDirection) {
   int newY = adjustCoordY(y);
   int onePxThatNeedsToBeReDrawn = moveDistanceForMonsters * multiplier;
   int startPointX = newX + (onePx * 4);
-  int endingPointX = startPointX + onePxThatNeedsToBeReDrawn;
 
   if (movementDirection == 'R') {
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx,
                            Black);
 
     startPointX = startPointX + onePx * 2; 
-    endingPointX = startPointX + onePxThatNeedsToBeReDrawn; 
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx,
                            White);
 
     startPointX = newX + (onePx * 3); 
-    endingPointX = startPointX + onePxThatNeedsToBeReDrawn; 
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 2,
                            Black);
 
     startPointX = startPointX + (onePx * 4); 
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 2,
                            White);
 
-    startPointX = newX + onePx - onePxThatNeedsToBeReDrawn;
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    startPointX = newX + onePx;
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
                            newY + onePx * 2,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 3,
                            Black);
 
     startPointX = startPointX + (onePx * 8);
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx * 2,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 3,
                            White);
 
-    startPointX = newX - onePxThatNeedsToBeReDrawn;
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    startPointX = newX;
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
                            newY + onePx * 3,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 7,
                            Black);
 
     startPointX = startPointX + (onePx * maxWidth);
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx * 3,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 7,
                            White);
     return;   
   }
 
   if (movementDirection == 'L') {
-    endingPointX = startPointX; 
-    startPointX = startPointX - onePxThatNeedsToBeReDrawn; 
 
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
                            newY,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX,
                            newY + onePx,
                            White);
 
     startPointX = startPointX + onePx * 2; 
-    endingPointX = startPointX + onePxThatNeedsToBeReDrawn;
-; 
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx,
                            Black);
 
-    endingPointX = startPointX;
-    startPointX = newX + (onePx * 3) - onePxThatNeedsToBeReDrawn; 
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    startPointX = newX + (onePx * 3); 
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
                            newY + onePx,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX,
                            newY + onePx * 2,
                            White);
 
     startPointX = startPointX + (onePx * 4); 
-    endingPointX = startPointX + onePxThatNeedsToBeReDrawn;
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 2,
                            Black);
 
-    endingPointX = startPointX;
-    startPointX = newX + onePx - onePxThatNeedsToBeReDrawn;
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    startPointX = newX + onePx;
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
                            newY + onePx * 2,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX,
                            newY + onePx * 3,
                            White);
 
-    endingPointX = startPointX + onePxThatNeedsToBeReDrawn;
     startPointX = startPointX + (onePx * 8);
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx * 2,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 3,
                            Black);
 
-    endingPointX = startPointX;
-    startPointX = newX - onePxThatNeedsToBeReDrawn;
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    startPointX = newX;
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
                            newY + onePx * 3,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX,
                            newY + onePx * 7,
                            White);
 
-    endingPointX = startPointX + onePxThatNeedsToBeReDrawn;
     startPointX = startPointX + (onePx * maxWidth);
-    ER5517.DrawSquare_Fill(startPointX <= 0 ? 0 : startPointX,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx * 3,
-                           endingPointX > gridXLimit * multiplier ? gridXLimit * multiplier : endingPointX,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 7,
                            Black);
     return;
