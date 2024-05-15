@@ -187,15 +187,15 @@ void drawMonster1Base (int x, int y, int color) {
 
   ER5517.DrawSquare_Fill(newX + (onePx * 4),
                          newY,
-                         (newX + (onePx * 5)) + onePx,
+                         (newX + (onePx * 4)) + onePx * 2,
                          newY + onePx,
-                         White);
+                         color);
 
   ER5517.DrawSquare_Fill(newX + (onePx * 3), //Marging from the widest part
                          newY + onePx ,
                          (newX + (onePx * 3)) + (onePx * 4), //Start + width
                          newY + onePx * 2, //Start + height
-                         White);
+                         color);
 
   ER5517.DrawSquare_Fill(newX + (onePx * 1),
                          newY + onePx * 2,
@@ -249,21 +249,21 @@ void reDrawMonster1(int x, int y, char movementDirection) {
     ER5517.DrawSquare_Fill(startPointX,
                            newY,
                            startPointX + onePxThatNeedsToBeReDrawn,
-                           newY + onePx,
-                           Black);
+                           newY + onePx - 1,
+                           Black); 
 
     startPointX = startPointX + onePx * 2; 
     ER5517.DrawSquare_Fill(startPointX,
                            newY,
                            startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx,
-                           White);
+                           White); 
 
     startPointX = newX + (onePx * 3); 
     ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx,
-                           startPointX + onePxThatNeedsToBeReDrawn,
-                           newY + onePx * 2,
+                          startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 2 - 1,
                            Black);
 
     startPointX = startPointX + (onePx * 4); 
@@ -274,10 +274,10 @@ void reDrawMonster1(int x, int y, char movementDirection) {
                            White);
 
     startPointX = newX + onePx;
-    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx * 2,
                            startPointX + onePxThatNeedsToBeReDrawn,
-                           newY + onePx * 3,
+                           newY + onePx * 3 - 1,
                            Black);
 
     startPointX = startPointX + (onePx * 8);
@@ -288,7 +288,7 @@ void reDrawMonster1(int x, int y, char movementDirection) {
                            White);
 
     startPointX = newX;
-    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+    ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx * 3,
                            startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 7,
