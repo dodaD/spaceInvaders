@@ -30,7 +30,7 @@ typedef struct {
 Ship spaceShip = {spaceShipX, spaceShipY, false};
 
 int monstersColumns[columns];
-char monstersMovingDirection = 'R';
+char monstersMovingDirection = 'L';
 char monstersAnimationPhase = 'O';
 typedef struct {
   int xCoord;
@@ -331,10 +331,11 @@ void moveMonsters() {
       if(allMonsters[r][c].isDeleted) {
         continue;
       }
-      drawMonster(r, c, White);
       if (monstersMovingDirection == 'L') {
         allMonsters[r][c].xCoord -= moveDistanceForMonsters;
+        drawMonster(r, c, White);
       } else if(monstersMovingDirection == 'R') {
+        drawMonster(r, c, White);
         allMonsters[r][c].xCoord += moveDistanceForMonsters;
       }
     }
