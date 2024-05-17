@@ -6,7 +6,7 @@ int buttonPinYellow = A3;
 bool isGameOver = false;
 
 #include "ScreenDriver.h"
-#include "Display.h" // WARNING: !!!!!!!!
+#include "DisplayTest.h" // WARNING: !!!!!!!!
 #include "Constants.h" 
 
 unsigned long previousMillisForMoving = 0UL;
@@ -123,11 +123,11 @@ if(isGameOver) {
     return;
   }
 
-  //drawGrid();
+  drawGrid();
   moveShipBullets();
   moveMonsters();
   checkCollisionWithMonsters();
-  checkCollisionWithShip();
+  //checkCollisionWithShip();
   monstersBulletsMove();
   monstersShoot();
   drawShip(White); 
@@ -147,12 +147,9 @@ if(isGameOver) {
 }
 
 void drawMonster(int r, int c, int colour) {
-    drawFigure(allMonsters[r][c].xCoord,
-        allMonsters[r][c].yCoord, 
-        sideOfMonster, 
-        sideOfMonster, 
-        colour
-        );
+ reDrawMonster1(allMonsters[r][c].xCoord,
+      allMonsters[r][c].yCoord,
+      monstersMovingDirection);
 }
 
 void drawShip(int colour) {
@@ -306,17 +303,21 @@ void createMonsters() {
       allMonsters[r][c].yCoord = positionY;
       allMonsters[r][c].typeOfMonster = currentMonsterType;
       allMonsters[r][c].isDeleted = false;
-      drawMonster(r, c, White);
+      drawMonster1Base(allMonsters[r][c].xCoord, allMonsters[r][c].yCoord, White);
     }
   }    
 }
 
 void moveMonsters() {
-  monstersChangeDirection();
+  if(monstersChangeDirection()) {
+    return;
+  }
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillisForMoving < interval) {
     return;
   }
+  previousMillisForMoving = currentMillis;
+
   if(intervalForSpeedingUp <
       currentMillis - previousMillisForSpeedingUp
       && interval >= speedDecerease
@@ -330,15 +331,12 @@ void moveMonsters() {
       if(allMonsters[r][c].isDeleted) {
         continue;
       }
-      drawMonster(r, c, Black);
+      drawMonster(r, c, White);
       if (monstersMovingDirection == 'L') {
         allMonsters[r][c].xCoord -= moveDistanceForMonsters;
-        previousMillisForMoving = currentMillis;
       } else if(monstersMovingDirection == 'R') {
         allMonsters[r][c].xCoord += moveDistanceForMonsters;
-        previousMillisForMoving = currentMillis;
       }
-      drawMonster(r, c, White);
     }
   } 
 }
@@ -462,7 +460,7 @@ void checkCollisionWithShip() {
   return;
 }
 
-void monstersChangeDirection() { 
+bool monstersChangeDirection() { 
   for(int c = columns - 1; c >= 0 && monstersMovingDirection == 'R'; c--) {
     if(monstersColumns[c] == 0) {
       continue;
@@ -474,7 +472,7 @@ void monstersChangeDirection() {
       if(allMonsters[r][c].xCoord >= gridXLimit - sideOfMonster) {
         monstersMovingDirection = 'L';
         lowerMonsters();
-        return;
+        return true;
       }
     }
   }
@@ -487,13 +485,14 @@ void monstersChangeDirection() {
       if(allMonsters[r][c].isDeleted == true ) {
         continue;
       }
-      if(allMonsters[r][c].xCoord < moveDistanceForMonsters ) {
+      if(allMonsters[r][c].xCoord <= 0) {
         monstersMovingDirection = 'R';
         lowerMonsters(); 
-        return;
+        return true;
       }
     }
   }
+  return false;
 }
 
 void lowerMonsters() { 
@@ -507,14 +506,16 @@ void lowerMonsters() {
         gamesStats.lifes = 0;
         return;
       }
-      drawFigure(
-          allMonsters[r][c].xCoord,
-          allMonsters[r][c].yCoord,
-          sideOfMonster,
-          1,
+      drawFigure(allMonsters[r][c].xCoord,
+          allMonsters[r][c].yCoord, 
+          sideOfMonster, 
+          sideOfMonster, 
           Black
           );
       allMonsters[r][c].yCoord -= 1;
+      drawMonster1Base(allMonsters[r][c].xCoord,
+          allMonsters[r][c].yCoord,
+          White);
     }
   }
 }

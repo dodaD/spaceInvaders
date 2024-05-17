@@ -241,11 +241,8 @@ void reDrawMonster1(int x, int y, char movementDirection) {
   int newY = adjustCoordY(y);
   int onePxThatNeedsToBeReDrawn = moveDistanceForMonsters * multiplier;
   int startPointX = newX + (onePx * 4);
-  if(newX < onePxThatNeedsToBeReDrawn) {
-    newX = onePxThatNeedsToBeReDrawn;
-  }
 
-  if (movementDirection == 'R') {
+   if (movementDirection == 'R') {
     ER5517.DrawSquare_Fill(startPointX,
                            newY,
                            startPointX + onePxThatNeedsToBeReDrawn,
