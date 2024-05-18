@@ -30,7 +30,7 @@ typedef struct {
 Ship spaceShip = {spaceShipX, spaceShipY, false};
 
 int monstersColumns[columns];
-char monstersMovingDirection = 'L';
+char monstersMovingDirection = 'R';
 char monstersAnimationPhase = 'O';
 typedef struct {
   int xCoord;
@@ -123,7 +123,7 @@ if(isGameOver) {
     return;
   }
 
-  drawGrid();
+ // drawGrid();
   moveShipBullets();
   moveMonsters();
   checkCollisionWithMonsters();
@@ -150,6 +150,20 @@ void drawMonster(int r, int c, int colour) {
  reDrawMonster1(allMonsters[r][c].xCoord,
       allMonsters[r][c].yCoord,
       monstersMovingDirection);
+}
+
+void drawAnimation(int r, int c, int colour) {
+  if(colour == Black) {
+    drawMonster1Animation(allMonsters[r][c].xCoord,
+        allMonsters[r][c].yCoord,
+        colour,
+        monstersAnimationPhase == 'O' ? 'C' : 'O');
+    return;
+  }
+  drawMonster1Animation(allMonsters[r][c].xCoord,
+      allMonsters[r][c].yCoord,
+      colour,
+      monstersAnimationPhase);
 }
 
 void drawShip(int colour) {
@@ -332,14 +346,31 @@ void moveMonsters() {
         continue;
       }
       if (monstersMovingDirection == 'L') {
+        drawAnimation(r, c, Black);
+
         allMonsters[r][c].xCoord -= moveDistanceForMonsters;
+
         drawMonster(r, c, White);
+        drawAnimation(r, c, White);
       } else if(monstersMovingDirection == 'R') {
+        drawAnimation(r, c, Black);
         drawMonster(r, c, White);
+
         allMonsters[r][c].xCoord += moveDistanceForMonsters;
+
+        drawAnimation(r, c, White);
       }
     }
   } 
+  changeAnimation();
+}
+
+void changeAnimation() {
+  if(monstersAnimationPhase == 'O') {
+    monstersAnimationPhase = 'C';
+  } else {
+    monstersAnimationPhase = 'O';
+  }
 }
 
 void createBulletsForMonsters() {

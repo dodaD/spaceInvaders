@@ -208,32 +208,6 @@ void drawMonster1Base (int x, int y, int color) {
                          newX + (onePx * maxWidth),
                          newY + onePx * 7,
                          color);
-
-
-
- /*  ER5517.DrawSquare_Fill(newX + onePx * 1,
-                         newY + onePx * 7,
-                         (newX + onePx * 1) + (onePx * 2),
-                         newY + onePx * 8, 
-                         color);
-
-  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
-                         newY + onePx * 7,
-                         (newX + onePx * (maxWidth - 3)) + (onePx * 2),
-                         newY + onePx * 8,
-                         color);
-
- ER5517.DrawSquare_Fill(newX + onePx * 1,
-                         newY + onePx * 9,
-                         (newX + onePx * 1) + (onePx * 2),
-                         newY + onePx * 10, 
-                         color);
-
-  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
-                         newY + onePx * 9,
-                         (newX + onePx * (maxWidth - 3)) + (onePx * 2),
-                         newY + onePx * 10,
-                         color);*/
 }
 
 void reDrawMonster1(int x, int y, char movementDirection) {
@@ -362,13 +336,60 @@ void reDrawMonster1(int x, int y, char movementDirection) {
 
 void drawMonster1Animation (int x, int y, int color, char typeOfAnimation) {
   int newX = adjustCoordX(x);
-  int newY = adjustCoordY(y);  
+  int newY = adjustCoordY(y); 
+
+  if (color == Black) {
+    ER5517.DrawSquare_Fill(newX + onePx * 1,
+                           newY + onePx * 4,
+                           (newX + onePx * 1) + onePx * 3,
+                           newY + onePx * 5,
+                           White);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                           newY + onePx * 4,
+                           (newX + onePx * (maxWidth - 4)) + onePx * 3,
+                           newY + onePx * 5,
+                           White);
+  } else {
+    ER5517.DrawSquare_Fill(newX + onePx * 1,
+                           newY + onePx * 4,
+                           (newX + onePx * 1) + onePx * 3,
+                           newY + onePx * 5,
+                           Black);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                           newY + onePx * 4,
+                           (newX + onePx * (maxWidth - 4)) + onePx * 3,
+                           newY + onePx * 5,
+                           Black);
+  } // WARNING: We need to find a better way to do this
+
+  
+  ER5517.DrawSquare_Fill(newX + onePx * 1,
+                         newY + onePx * 7,
+                         (newX + onePx * 1) + (onePx * 2),
+                         newY + onePx * 8, 
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
+                         newY + onePx * 7,
+                         (newX + onePx * (maxWidth - 3)) + (onePx * 2),
+                         newY + onePx * 8,
+                         color);
+
+ ER5517.DrawSquare_Fill(newX + onePx * 1,
+                         newY + onePx * 9,
+                         (newX + onePx * 1) + (onePx * 2),
+                         newY + onePx * 10, 
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
+                         newY + onePx * 9,
+                         (newX + onePx * (maxWidth - 3)) + (onePx * 2),
+                         newY + onePx * 10,
+                         color);
 
   if(typeOfAnimation == 'C') { 
-    if (color != Black) {
-      drawMonster1Animation(x, y, Black, 'O');
-    }
-
     ER5517.DrawSquare_Fill(newX,
                            newY + onePx * 8,
                            newX + (onePx * 2),
@@ -383,9 +404,6 @@ void drawMonster1Animation (int x, int y, int color, char typeOfAnimation) {
     return;
   } 
 
-  if (color != Black) {
-    drawMonster1Animation(x, y, Black, 'C');
-  }
   ER5517.DrawSquare_Fill(newX + onePx * 2,
                          newY + onePx * 8,
                          (newX + onePx * 2) + (onePx * 2),
