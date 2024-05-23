@@ -26,7 +26,7 @@ int adjustCoordY(float oldYCoord) {
 }
 
 void drawFigure(int x, int y, int width, int height, int colour) {
-  if (x > gridXLimit
+  if (x >= gridXLimit
     || y > gridYLimit
     || x <  0 - width
     || y < height
@@ -184,28 +184,32 @@ void drawMonster1Base (int x, int y, int color) {
 
   int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);
+  int reduceWidthBy = 0;
+  if (newX >= (gridXLimit * multiplier) - (onePx * maxWidth)) {
+    reduceWidthBy = 1;
+  }
 
   ER5517.DrawSquare_Fill(newX + (onePx * 4),
                          newY,
-                         (newX + (onePx * 4)) + onePx * 2,
+                         (newX + (onePx * 4)) + onePx * 2 - reduceWidthBy,
                          newY + onePx,
                          color);
 
   ER5517.DrawSquare_Fill(newX + (onePx * 3), //Marging from the widest part
                          newY + onePx ,
-                         (newX + (onePx * 3)) + (onePx * 4), //Start + width
+                         (newX + (onePx * 3)) + (onePx * 4) - reduceWidthBy, //Start + width
                          newY + onePx * 2, //Start + height
                          color);
 
   ER5517.DrawSquare_Fill(newX + (onePx * 1),
                          newY + onePx * 2,
-                         (newX + (onePx * 1)) + (onePx * 8),
+                         (newX + (onePx * 1)) + (onePx * 8) - reduceWidthBy,
                          newY + onePx * 3,
                          color);
 
   ER5517.DrawSquare_Fill(newX,
                          newY + onePx * 3,
-                         newX + (onePx * maxWidth),
+                         newX + (onePx * maxWidth) - reduceWidthBy,
                          newY + onePx * 7,
                          color);
 }
@@ -233,7 +237,7 @@ void reDrawMonster1(int x, int y, char movementDirection) {
     startPointX = newX + (onePx * 3); 
     ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx,
-                          startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           startPointX + onePxThatNeedsToBeReDrawn,
                            newY + onePx * 2 - 1,
                            Black);
 
