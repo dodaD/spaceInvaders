@@ -184,32 +184,28 @@ void drawMonster1Base (int x, int y, int color) {
 
   int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);
-  int reduceWidthBy = 0;
-  if (newX >= (gridXLimit * multiplier) - (onePx * maxWidth)) {
-    reduceWidthBy = 1;
-  }
 
   ER5517.DrawSquare_Fill(newX + (onePx * 4),
                          newY,
-                         (newX + (onePx * 4)) + onePx * 2 - reduceWidthBy,
+                         (newX + (onePx * 4)) + onePx * 2 - 1,
                          newY + onePx,
                          color);
 
   ER5517.DrawSquare_Fill(newX + (onePx * 3), //Marging from the widest part
                          newY + onePx ,
-                         (newX + (onePx * 3)) + (onePx * 4) - reduceWidthBy, //Start + width
+                         (newX + (onePx * 3)) + (onePx * 4) - 1, //Start + width
                          newY + onePx * 2, //Start + height
                          color);
 
   ER5517.DrawSquare_Fill(newX + (onePx * 1),
                          newY + onePx * 2,
-                         (newX + (onePx * 1)) + (onePx * 8) - reduceWidthBy,
+                         (newX + (onePx * 1)) + (onePx * 8) - 1,
                          newY + onePx * 3,
                          color);
 
   ER5517.DrawSquare_Fill(newX,
                          newY + onePx * 3,
-                         newX + (onePx * maxWidth) - reduceWidthBy,
+                         newX + (onePx * maxWidth) - 1,
                          newY + onePx * 7,
                          color);
 }
@@ -219,6 +215,10 @@ void reDrawMonster1(int x, int y, char movementDirection) {
   int newY = adjustCoordY(y);
   int onePxThatNeedsToBeReDrawn = moveDistanceForMonsters * multiplier;
   int startPointX = newX + (onePx * 4);
+
+  /*The problem:
+   * When side of monster is 5, the  base and redrawing are more by one pixel.
+   * BUt if side is 7, it's all okay.*/
 
    if (movementDirection == 'R') {
     ER5517.DrawSquare_Fill(startPointX,
@@ -230,7 +230,7 @@ void reDrawMonster1(int x, int y, char movementDirection) {
     startPointX = startPointX + onePx * 2; 
     ER5517.DrawSquare_Fill(startPointX,
                            newY,
-                           startPointX + onePxThatNeedsToBeReDrawn,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
                            newY + onePx,
                            White); 
 
@@ -244,7 +244,7 @@ void reDrawMonster1(int x, int y, char movementDirection) {
     startPointX = startPointX + (onePx * 4); 
     ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx,
-                           startPointX + onePxThatNeedsToBeReDrawn,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
                            newY + onePx * 2,
                            White);
 
@@ -258,7 +258,7 @@ void reDrawMonster1(int x, int y, char movementDirection) {
     startPointX = startPointX + (onePx * 8);
     ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx * 2,
-                           startPointX + onePxThatNeedsToBeReDrawn,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
                            newY + onePx * 3,
                            White);
 
@@ -272,7 +272,7 @@ void reDrawMonster1(int x, int y, char movementDirection) {
     startPointX = startPointX + (onePx * maxWidth);
     ER5517.DrawSquare_Fill(startPointX,
                            newY + onePx * 3,
-                           startPointX + onePxThatNeedsToBeReDrawn,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
                            newY + onePx * 7,
                            White);
     return;   
