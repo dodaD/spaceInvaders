@@ -6,7 +6,7 @@ int buttonPinYellow = A3;
 bool isGameOver = false;
 
 #include "ScreenDriver.h"
-#include "DisplayTest.h" // WARNING: !!!!!!!!
+#include "Display.h" 
 #include "Constants.h" 
 
 unsigned long previousMillisForMoving = 0UL;
@@ -94,7 +94,7 @@ void setup() {
 }
 
 void loop() {
-if(isGameOver) {
+  if(isGameOver) {
     if(digitalRead(buttonPinGreen) == LOW) {
       restartGame();
     } else if (digitalRead(buttonPinYellow) == LOW) {
@@ -123,11 +123,11 @@ if(isGameOver) {
     return;
   }
 
- // drawGrid();
+  // drawGrid();
   moveShipBullets();
   moveMonsters();
   checkCollisionWithMonsters();
-  //checkCollisionWithShip();
+  checkCollisionWithShip();
   monstersBulletsMove();
   monstersShoot();
   drawShip(White); 
@@ -143,27 +143,82 @@ if(isGameOver) {
   if (digitalRead(buttonPinRed) == LOW){
     shootFromShip();
   }
-
 }
 
 void drawMonster(int r, int c, int colour) {
- reDrawMonster1(allMonsters[r][c].xCoord,
+  if (allMonsters[r][c].typeOfMonster == 1) {
+    reDrawMonster1(allMonsters[r][c].xCoord,
+        allMonsters[r][c].yCoord,
+        monstersMovingDirection, White);
+    return;
+  } else if (allMonsters[r][c].typeOfMonster == 2) {
+    reDrawMonster2(allMonsters[r][c].xCoord,
+        allMonsters[r][c].yCoord,
+        monstersMovingDirection, White);
+    return;
+  }
+  reDrawMonster3(allMonsters[r][c].xCoord,
       allMonsters[r][c].yCoord,
-      monstersMovingDirection);
+      monstersMovingDirection, White);
 }
 
 void drawAnimation(int r, int c, int colour) {
-  if(colour == Black) {
+  if (allMonsters[r][c].typeOfMonster == 1) {
+    if (colour == Black) {
+      drawMonster1Animation(allMonsters[r][c].xCoord,
+          allMonsters[r][c].yCoord,
+          colour,
+          monstersAnimationPhase == 'O' ? 'C' : 'O'); 
+      return;
+    }
     drawMonster1Animation(allMonsters[r][c].xCoord,
         allMonsters[r][c].yCoord,
         colour,
-        monstersAnimationPhase == 'O' ? 'C' : 'O');
+        monstersAnimationPhase); 
+    return;
+  } else if (allMonsters[r][c].typeOfMonster == 2) {
+    if (colour == Black) {
+      drawMonster2Animation(allMonsters[r][c].xCoord,
+          allMonsters[r][c].yCoord,
+          colour,
+          monstersAnimationPhase == 'O' ? 'C' : 'O'); 
+      return;
+    }
+    drawMonster2Animation(allMonsters[r][c].xCoord,
+        allMonsters[r][c].yCoord,
+        colour,
+        monstersAnimationPhase);
     return;
   }
-  drawMonster1Animation(allMonsters[r][c].xCoord,
+
+  if(colour == Black) {
+    drawMonster3Animation(allMonsters[r][c].xCoord,
+        allMonsters[r][c].yCoord,
+        colour,
+        monstersAnimationPhase == 'O' ? 'C' : 'O'); 
+    return;
+  }
+  drawMonster3Animation(allMonsters[r][c].xCoord,
       allMonsters[r][c].yCoord,
       colour,
-      monstersAnimationPhase);
+      monstersAnimationPhase); 
+}
+
+void drawBase (int r, int c) {
+  if (allMonsters[r][c].typeOfMonster == 1) {
+    drawMonster1Base(allMonsters[r][c].xCoord,
+        allMonsters[r][c].yCoord,
+        White);
+    return;
+  } else if (allMonsters[r][c].typeOfMonster == 2) {
+    drawMonster2Base(allMonsters[r][c].xCoord,
+        allMonsters[r][c].yCoord,
+        White);
+    return;
+  }
+  drawMonster3Base(allMonsters[r][c].xCoord,
+      allMonsters[r][c].yCoord,
+      White);
 }
 
 void drawShip(int colour) {
@@ -252,7 +307,12 @@ void checkCollisionWithMonsters() {
           >= spaceShipBullet.xCoord
          ){
         spaceShipBullet.isReadyToShoot = true;
-        drawMonster(r, c, Black);
+        drawFigure(allMonsters[r][c].xCoord,
+            allMonsters[r][c].yCoord, 
+            sideOfMonster, 
+            sideOfMonster, 
+            Black
+            );
         drawShipBullet(Black);
         allMonsters[r][c].isDeleted = true;
         monstersColumns[c] -= 1;
@@ -317,7 +377,7 @@ void createMonsters() {
       allMonsters[r][c].yCoord = positionY;
       allMonsters[r][c].typeOfMonster = currentMonsterType;
       allMonsters[r][c].isDeleted = false;
-      drawMonster1Base(allMonsters[r][c].xCoord, allMonsters[r][c].yCoord, White);
+      drawBase(r, c);
     }
   }    
 }
@@ -347,10 +407,10 @@ void moveMonsters() {
       }
       if (monstersMovingDirection == 'L') {
         drawAnimation(r, c, Black);
+        drawMonster(r, c, White);
 
         allMonsters[r][c].xCoord -= moveDistanceForMonsters;
 
-        drawMonster(r, c, White);
         drawAnimation(r, c, White);
       } else if(monstersMovingDirection == 'R') {
         drawAnimation(r, c, Black);
@@ -545,9 +605,8 @@ void lowerMonsters() {
           Black
           );
       allMonsters[r][c].yCoord -= 1;
-      drawMonster1Base(allMonsters[r][c].xCoord,
-          allMonsters[r][c].yCoord,
-          White);
+      drawBase(r, c);
+
     }
   }
 }

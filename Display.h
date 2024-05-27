@@ -26,7 +26,7 @@ int adjustCoordY(float oldYCoord) {
 }
 
 void drawFigure(int x, int y, int width, int height, int colour) {
-  if (x > gridXLimit
+  if (x >= gridXLimit
     || y > gridYLimit
     || x <  0 - width
     || y < height
@@ -174,106 +174,247 @@ void drawWinningText(int bonusPointsForSpeed, int bonusPointsForLivesLeft) {
 }
 
 void drawMonster1Base (int x, int y, int color) {
-  int newX = adjustCoordX(x); //Start of widest part
+  if (x > gridXLimit
+    || y > gridYLimit
+    || x <  0 - sideOfMonster
+    || y < sideOfMonster
+  ) {
+    return;
+  }
+
+  int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);
 
   ER5517.DrawSquare_Fill(newX + (onePx * 4),
                          newY,
-                         (newX + (onePx * 5)) + onePx,
+                         (newX + (onePx * 4)) + onePx * 2 - 1,
                          newY + onePx,
-                         Red);
+                         color);
 
   ER5517.DrawSquare_Fill(newX + (onePx * 3), //Marging from the widest part
                          newY + onePx ,
-                         (newX + (onePx * 3)) + (onePx * 4), //Start + width
+                         (newX + (onePx * 3)) + (onePx * 4) - 1, //Start + width
                          newY + onePx * 2, //Start + height
-                         Red);
+                         color);
 
   ER5517.DrawSquare_Fill(newX + (onePx * 1),
                          newY + onePx * 2,
-                         (newX + (onePx * 1)) + (onePx * 8),
+                         (newX + (onePx * 1)) + (onePx * 8) - 1,
                          newY + onePx * 3,
                          color);
 
   ER5517.DrawSquare_Fill(newX,
                          newY + onePx * 3,
-                         newX + (onePx * maxWidth),
+                         newX + (onePx * maxWidth) - 1,
                          newY + onePx * 7,
                          color);
+}
 
-  ER5517.DrawSquare_Fill(newX + onePx * 1,
-                         newY + onePx * 4,
-                         (newX + onePx * 1) + onePx * 3,
-                         newY + onePx * 5,
-                         Black);
+void reDrawMonster1 (int x, int y, char movementDirection, int colorOfMonster) {
+  int newX = adjustCoordX(x);
+  int newY = adjustCoordY(y);
+  int onePxThatNeedsToBeReDrawn = moveDistanceForMonsters * multiplier;
+  int startPointX = newX + (onePx * 4);
 
-  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
-                         newY + onePx * 4,
-                         (newX + onePx * (maxWidth - 4)) + onePx * 3,
-                         newY + onePx * 5,
-                         Black);
+  if (movementDirection == 'R') {
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY,
+                           startPointX + onePxThatNeedsToBeReDrawn,
+                           newY + onePx - 1,
+                           Black); 
 
-  ER5517.DrawSquare_Fill(newX + onePx * 1,
-                         newY + onePx * 7,
-                         (newX + onePx * 1) + (onePx * 2),
-                         newY + onePx * 8, 
-                         color);
+    startPointX = startPointX + onePx * 2; 
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx,
+                           colorOfMonster); 
 
-  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
-                         newY + onePx * 7,
-                         (newX + onePx * (maxWidth - 3)) + (onePx * 2),
-                         newY + onePx * 8,
-                         color);
+    startPointX = newX + (onePx * 3); 
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx,
+                           startPointX + onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 2 - 1,
+                           Black);
 
-  ER5517.DrawSquare_Fill(newX + onePx * 1,
-                         newY + onePx * 9,
-                         (newX + onePx * 1) + (onePx * 2),
-                         newY + onePx * 10, 
-                         color);
+    startPointX = startPointX + (onePx * 4); 
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 2,
+                           colorOfMonster);
 
-  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
-                         newY + onePx * 9,
-                         (newX + onePx * (maxWidth - 3)) + (onePx * 2),
-                         newY + onePx * 10,
-                         color);
+    startPointX = newX + onePx;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 2,
+                           startPointX + onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 3 - 1,
+                           Black);
+
+    startPointX = startPointX + (onePx * 8);
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 2,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 3,
+                           colorOfMonster);
+
+    startPointX = newX;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 3,
+                           startPointX + onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 7,
+                           Black);
+
+    startPointX = startPointX + (onePx * maxWidth);
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 3,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 7,
+                           colorOfMonster);
+    return;   
+  }
+
+  if (movementDirection == 'L') {
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                           newY,
+                           startPointX,
+                           newY + onePx,
+                           colorOfMonster); 
+
+    startPointX = startPointX + onePx * 2; 
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                           newY,
+                           startPointX,
+                           newY + onePx,
+                           Black); 
+
+    startPointX = newX + (onePx * 3); 
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                           newY + onePx,
+                           startPointX,
+                           newY + onePx * 2,
+                           colorOfMonster);
+
+    startPointX = startPointX + (onePx * 4); 
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                           newY + onePx,
+                           startPointX,
+                           newY + onePx * 2,
+                           Black);
+
+    startPointX = newX + onePx;
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 2,
+                           startPointX,
+                           newY + onePx * 3,
+                           colorOfMonster);
+
+    startPointX = startPointX + (onePx * 8);
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 2,
+                           startPointX,
+                           newY + onePx * 3,
+                           Black);
+
+    startPointX = newX;
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 3,
+                           startPointX,
+                           newY + onePx * 7,
+                           colorOfMonster);
+
+    startPointX = startPointX + (onePx * maxWidth);
+    ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 3,
+                           startPointX,
+                           newY + onePx * 7,
+                           Black);
+    return;
+  }
+
 }
 
 void drawMonster1Animation (int x, int y, int color, char typeOfAnimation) {
   int newX = adjustCoordX(x);
-  int newY = adjustCoordY(y);  
+  int newY = adjustCoordY(y); 
+
+  if (color == Black) { //DRAWING EYES
+    ER5517.DrawSquare_Fill(newX + onePx * 1,
+                           newY + onePx * 4,
+                           (newX + onePx * 1) + onePx * 3,
+                           newY + onePx * 5,
+                           White);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                           newY + onePx * 4,
+                           (newX + onePx * (maxWidth - 4)) + onePx * 3,
+                           newY + onePx * 5,
+                           White);
+  } else {
+    ER5517.DrawSquare_Fill(newX + onePx * 1,
+                           newY + onePx * 4,
+                           (newX + onePx * 1) + onePx * 3,
+                           newY + onePx * 5,
+                           Black);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                           newY + onePx * 4,
+                           (newX + onePx * (maxWidth - 4)) + onePx * 3,
+                           newY + onePx * 5,
+                           Black);
+  }
+
+
+  ER5517.DrawSquare_Fill(newX + onePx * 1,
+                         newY + onePx * 7,
+                         (newX + onePx * 1) + (onePx * 2) - 1,
+                         newY + onePx * 8 - 1,
+                         color
+                         );
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
+                         newY + onePx * 7,
+                         (newX + onePx * (maxWidth - 3)) + (onePx * 2) - 1,
+                         newY + onePx * 8 - 1,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * 1,
+                         newY + onePx * 9,
+                         (newX + onePx * 1) + (onePx * 2) - 1,
+                         newY + onePx * 10 - 1, 
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
+                         newY + onePx * 9,
+                         (newX + onePx * (maxWidth - 3)) + (onePx * 2) - 1,
+                         newY + onePx * 10 - 1,
+                         color);
 
   if(typeOfAnimation == 'C') { 
-    if (color != Black) {
-      drawMonster1Animation(x, y, Black, 'O');
-    }
-
     ER5517.DrawSquare_Fill(newX,
                            newY + onePx * 8,
-                           newX + (onePx * 2),
-                           newY + onePx * 9,
+                           newX + (onePx * 2) - 1,
+                           newY + onePx * 9 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 2),
                            newY + onePx * 8,
-                           (newX + onePx * (maxWidth - 2)) + (onePx * 2),
-                           newY + onePx * 9,
+                           (newX + onePx * (maxWidth - 2)) + (onePx * 2) - 1,
+                           newY + onePx * 9 - 1,
                            color);
     return;
   } 
 
-  if (color != Black) {
-    drawMonster1Animation(x, y, Black, 'C');
-  }
   ER5517.DrawSquare_Fill(newX + onePx * 2,
                          newY + onePx * 8,
-                         (newX + onePx * 2) + (onePx * 2),
-                         newY + onePx * 9,
+                         (newX + onePx * 2) + (onePx * 2) - 1,
+                         newY + onePx * 9 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
                          newY + onePx * 8,
-                         (newX + onePx * (maxWidth - 4)) + (onePx * 2),
-                         newY + onePx * 9,
+                         (newX + onePx * (maxWidth - 4)) + (onePx * 2) - 1,
+                         newY + onePx * 9 - 1,
                          color);
 
 }
@@ -342,105 +483,269 @@ void drawMonster2Base (int x, int y, int color) {
                          newY + onePx * 8,
                          color);
 
-  ER5517.DrawSquare_Fill(newX + onePx * 3,
-                         newY + onePx * 5,
-                         (newX + onePx * 3) + onePx * 1,
-                         newY + onePx * 6,
-                         Black);
-
-  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
-                         newY + onePx * 5,
-                         (newX + onePx * (maxWidth - 4)) + onePx * 1,
-                         newY + onePx * 6,
-                         Black);
 }
 
+void reDrawMonster2 (int x, int y, char movementDirection, int colorOfMonster) {
+  int newX = adjustCoordX(x);
+  int newY = adjustCoordY(y);  
+  int onePxThatNeedsToBeReDrawn = moveDistanceForMonsters * multiplier;
+  int startPointX = newX + onePx * 3;
 
+  if (movementDirection == 'R') {
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 3,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 4,
+                           Black);
+
+    startPointX = startPointX + onePx * 4;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 3,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 4,
+                           colorOfMonster);
+
+    startPointX = newX + onePx * 2;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 4 - 1,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 5,
+                           Black);
+
+    startPointX = startPointX + onePx * 6;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 4 - 1,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 5,
+                           colorOfMonster);
+
+    startPointX = newX + onePx;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 5 - 1,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 7,
+                           Black);
+
+    startPointX = startPointX + onePx * 8;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 5 - 1,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 7,
+                           colorOfMonster);
+
+    startPointX = newX + onePx * 2;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 7 - 1,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 8,
+                           Black);
+
+    startPointX = newX + onePx * (maxWidth - 2);
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 7 - 1,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 8,
+                           colorOfMonster);
+    return;
+  }
+
+  //****** LEFT MOVEMENT ********
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 3,
+                         startPointX,
+                         newY + onePx * 4,
+                         colorOfMonster);
+
+  startPointX = startPointX + onePx * 4;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 3,
+                         startPointX,
+                         newY + onePx * 4,
+                         Black);
+
+  startPointX = newX + onePx * 2;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 4 - 1,
+                         startPointX,
+                         newY + onePx * 5,
+                         colorOfMonster);
+
+  startPointX = startPointX + onePx * 6;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 4 - 1,
+                         startPointX,
+                         newY + onePx * 5,
+                         Black);
+
+  startPointX = newX + onePx;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 5 - 1,
+                         startPointX,
+                         newY + onePx * 7,
+                         colorOfMonster);
+
+  startPointX = startPointX + onePx * 8;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 5 - 1,
+                         startPointX,
+                         newY + onePx * 7,
+                         Black);
+
+  startPointX = newX + onePx * 2;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 7 - 1,
+                         startPointX,
+                         newY + onePx * 8 - 1,
+                         colorOfMonster);
+
+  startPointX = newX + onePx * (maxWidth - 2);
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 7 - 1,
+                         startPointX,
+                         newY + onePx * 8,
+                         Black);
+}
 
 void drawMonster2Animation (int x, int y, int color, char typeOfAnimation) { 
   int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);
-  if (typeOfAnimation == 'C') {
-    if (color != Black) {
-      drawMonster2Animation(x, y, Black, 'O');
-    }
 
+  if (color == Black) { //DRAWING EYES
+    ER5517.DrawSquare_Fill(newX + onePx * 3, //EYES
+                           newY + onePx * 5,
+                           (newX + onePx * 3) + onePx * 1,
+                           newY + onePx * 6,
+                           White);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                           newY + onePx * 5,
+                           (newX + onePx * (maxWidth - 4)) + onePx * 1,
+                           newY + onePx * 6,
+                           White);
+  } else {
+    ER5517.DrawSquare_Fill(newX + onePx * 3, //EYES
+                           newY + onePx * 5,
+                           (newX + onePx * 3) + onePx * 1,
+                           newY + onePx * 6,
+                           Black);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                           newY + onePx * 5,
+                           (newX + onePx * (maxWidth - 4)) + onePx * 1,
+                           newY + onePx * 6,
+                           Black);
+  }
+
+  //Antennas
+  ER5517.DrawSquare_Fill(newX + onePx,
+                         newY,
+                         (newX + onePx) + onePx,
+                         newY + onePx,
+                         color); 
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 2),
+                         newY,
+                         (newX + onePx * (maxWidth - 2)) + onePx,
+                         newY + onePx,
+                         color); 
+
+  ER5517.DrawSquare_Fill(newX + onePx * 2,
+                         newY + onePx,
+                         (newX + onePx * 2) + onePx,
+                         newY + onePx * 2,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
+                         newY + onePx,
+                         (newX + onePx * (maxWidth - 3)) + onePx,
+                         newY + onePx * 2,
+                         color); 
+
+  ER5517.DrawSquare_Fill(newX + onePx * 3,
+                         newY + onePx * 2,
+                         (newX + onePx * 3) + onePx,
+                         newY + onePx * 3,
+                         color);
+
+  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                         newY + onePx * 2,
+                         (newX + onePx * (maxWidth - 4)) + onePx,
+                         newY + onePx * 3,
+                         color);
+
+  if (typeOfAnimation == 'C') {
     ER5517.DrawSquare_Fill(newX,
                            newY + onePx * 6,
-                           newX + onePx,
-                           newY + onePx * 9,
+                           newX + onePx - 1,
+                           newY + onePx * 9 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 1),
                            newY + onePx * 6,
-                           (newX + onePx * (maxWidth - 1)) + onePx,
-                           newY + onePx * 9,
+                           (newX + onePx * (maxWidth - 1)) + onePx - 1,
+                           newY + onePx * 9 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * 2,
                            newY + onePx * 8,
-                           (newX + onePx * 2) + onePx,
-                           newY + onePx * 9,
+                           (newX + onePx * 2) + onePx - 1,
+                           newY + onePx * 9 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
                            newY + onePx * 8,
-                           (newX + onePx * (maxWidth - 3)) + onePx,
-                           newY + onePx * 9,
+                           (newX + onePx * (maxWidth - 3)) + onePx - 1,
+                           newY + onePx * 9 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * 3,
                            newY + onePx * 9,
-                           (newX + onePx * 3) + onePx,
-                           newY + onePx * 10,
+                           (newX + onePx * 3) + onePx - 1,
+                           newY + onePx * 10 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
                            newY + onePx * 9,
-                           (newX + onePx * (maxWidth - 4)) + onePx,
-                           newY + onePx * 10,
+                           (newX + onePx * (maxWidth - 4)) + onePx - 1,
+                           newY + onePx * 10 - 1,
                            color);
     return;
   }
 
-  if (color != Black) {
-    drawMonster2Animation(x, y, Black, 'C');
-  }
-
   ER5517.DrawSquare_Fill(newX,
                          newY + onePx * 3,
-                         newX + onePx,
-                         newY + onePx * 6,
+                         newX + onePx - 1,
+                         newY + onePx * 6 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 1),
                          newY + onePx * 3,
-                         (newX + onePx * (maxWidth - 1)) + onePx,
-                         newY + onePx * 6,
+                         (newX + onePx * (maxWidth - 1)) + onePx - 1,
+                         newY + onePx * 6 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * 2,
                          newY + onePx * 8,
-                         (newX + onePx * 2) + onePx,
-                         newY + onePx * 9,
+                         (newX + onePx * 2) + onePx - 1,
+                         newY + onePx * 9 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
                          newY + onePx * 8,
-                         (newX + onePx * (maxWidth - 3)) + onePx,
-                         newY + onePx * 9,
+                         (newX + onePx * (maxWidth - 3)) + onePx - 1,
+                         newY + onePx * 9 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx,
                          newY + onePx * 9,
-                         (newX + onePx) + onePx,
-                         newY + onePx * 10,
+                         (newX + onePx) + onePx - 1,
+                         newY + onePx * 10 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 2),
                          newY + onePx * 9,
-                         (newX + onePx * (maxWidth - 2)) + onePx,
-                         newY + onePx * 10,
+                         (newX + onePx * (maxWidth - 2)) + onePx - 1,
+                         newY + onePx * 10 - 1,
                          color);
 }
 
@@ -450,152 +755,292 @@ void drawMonster3Base (int x, int y, int color) {
 
   ER5517.DrawSquare_Fill(newX + onePx * 5,
                          newY,
-                         (newX + onePx * 5) + onePx * 1,
+                         (newX + onePx * 5) + onePx * 1 - 1,
                          newY + onePx,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * 4,
                          newY + onePx,
-                         (newX + onePx * 4) + onePx * 2,
+                         (newX + onePx * 4) + onePx * 2 - 1,
                          newY + onePx * 2,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * 2,
                          newY + onePx * 2,
-                         (newX + onePx * 2) + onePx * 6,
+                         (newX + onePx * 2) + onePx * 6 - 1,
                          newY + onePx * 3,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx,
                          newY + onePx * 3,
-                         (newX + onePx) + onePx * 8,
+                         (newX + onePx) + onePx * 8 - 1,
                          newY + onePx * 4,
                          color);
 
   ER5517.DrawSquare_Fill(newX,
                          newY + onePx * 4,
-                         newX + onePx * 10,
+                         newX + onePx * 10 - 1,
                          newY + onePx * 7,
                          color);
-
-  ER5517.DrawSquare_Fill(newX + onePx * 2,
-                         newY + onePx * 5,
-                         (newX + onePx * 2) + onePx * 2,
-                         newY + onePx * 6,
-                         Black);
-
-  ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
-                         newY + onePx * 5,
-                         (newX + onePx * (maxWidth - 4)) + onePx * 2,
-                         newY + onePx * 6,
-                         Black);
 }
+
+void reDrawMonster3 (int x, int y, char movementDirection, int colorOfMonster) {
+  int newX = adjustCoordX(x);
+  int newY = adjustCoordY(y);
+  int onePxThatNeedsToBeReDrawn = moveDistanceForMonsters * multiplier;
+  int startPointX = newX + onePx * 5;
+
+  if (movementDirection == 'R') {
+    startPointX = newX + onePx * 4;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx,
+                           startPointX + onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 2 - 1,
+                           Black);
+
+    startPointX = startPointX + onePx * 2;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 2 - 1,
+                           colorOfMonster);
+
+    startPointX = newX + onePx * 2;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 2,
+                           startPointX + onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 3 - 1,
+                           Black);
+
+    startPointX = startPointX + onePx * 6;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 2,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 3 - 1,
+                           colorOfMonster);
+
+    startPointX = newX + onePx;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 3,
+                           startPointX + onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 4 - 1,
+                           Black);
+
+    startPointX = startPointX + onePx * 8;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 3,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 4 - 1,
+                           colorOfMonster);
+
+    startPointX = newX;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 4,
+                           startPointX + onePxThatNeedsToBeReDrawn,
+                           newY + onePx * 7,
+                           Black);
+
+    startPointX = startPointX + onePx * 10;
+    ER5517.DrawSquare_Fill(startPointX,
+                           newY + onePx * 4,
+                           startPointX + onePxThatNeedsToBeReDrawn - 1,
+                           newY + onePx * 7,
+                           colorOfMonster);
+    return;
+  }
+
+  startPointX = newX + onePx * 4;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx,
+                         startPointX,
+                         newY + onePx * 2 - 1,
+                         colorOfMonster);
+
+  startPointX = startPointX + onePx * 2;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx,
+                         startPointX,
+                         newY + onePx * 2 - 1,
+                         Black);
+
+  startPointX = newX + onePx * 2;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 2,
+                         startPointX,
+                         newY + onePx * 3 - 1,
+                         colorOfMonster);
+
+  startPointX = startPointX + onePx * 6;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 2,
+                         startPointX,
+                         newY + onePx * 3 - 1,
+                         Black);
+
+  startPointX = newX + onePx;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 3,
+                         startPointX,
+                         newY + onePx * 4 - 1,
+                         colorOfMonster);
+
+  startPointX = startPointX + onePx * 8;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 3,
+                         startPointX,
+                         newY + onePx * 4 - 1,
+                         Black);
+
+  startPointX = newX;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 4,
+                         startPointX,
+                         newY + onePx * 7,
+                         colorOfMonster);
+
+  startPointX = startPointX + onePx * 10;
+  ER5517.DrawSquare_Fill(startPointX - onePxThatNeedsToBeReDrawn,
+                         newY + onePx * 4,
+                         startPointX,
+                         newY + onePx * 7,
+                         Black);
+
+}
+
 
 void drawMonster3Animation (int x, int y, int color, char typeOfAnimation) { 
   int newX = adjustCoordX(x);
   int newY = adjustCoordY(y);
+
+  if (color == Black) { //DRAWING EYES
+    ER5517.DrawSquare_Fill(newX + onePx * 2,
+                           newY + onePx * 5,
+                           (newX + onePx * 2) + onePx * 2,
+                           newY + onePx * 6,
+                           White);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                           newY + onePx * 5,
+                           (newX + onePx * (maxWidth - 4)) + onePx * 2,
+                           newY + onePx * 6,
+                           White);
+  } else {
+    ER5517.DrawSquare_Fill(newX + onePx * 2,
+                           newY + onePx * 5,
+                           (newX + onePx * 2) + onePx * 2,
+                           newY + onePx * 6,
+                           Black);
+
+    ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
+                           newY + onePx * 5,
+                           (newX + onePx * (maxWidth - 4)) + onePx * 2,
+                           newY + onePx * 6,
+                           Black);
+  }
+  //Top hat (1px wide)
+  ER5517.DrawSquare_Fill(newX + onePx * 5,
+                         newY,
+                         (newX + onePx * 5) + onePx * 1 - 1,
+                         newY + onePx,
+                         color);
+
   if (typeOfAnimation == 'C') {
-    if (color != Black) {
-      drawMonster3Animation(x, y, Black, 'O');
-    }
     ER5517.DrawSquare_Fill(newX + onePx * 2,
                            newY + onePx * 7,
                            (newX + onePx * 2) + onePx,
-                           newY + onePx * 8,
+                           newY + onePx * 8 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
                            newY + onePx * 7,
                            (newX + onePx * (maxWidth - 3)) + onePx,
-                           newY + onePx * 8,
+                           newY + onePx * 8 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * 4,
                            newY + onePx * 7,
                            (newX + onePx * 4) + onePx * 2,
-                           newY + onePx * 8,
+                           newY + onePx * 8 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx,
                            newY + onePx * 8,
                            (newX + onePx) + onePx,
-                           newY + onePx * 9,
+                           newY + onePx * 9 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 2),
                            newY + onePx * 8,
                            (newX + onePx * (maxWidth - 2)) + onePx,
-                           newY + onePx * 9,
+                           newY + onePx * 9 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * 2,
                            newY + onePx * 9,
                            (newX + onePx * 2) + onePx,
-                           newY + onePx * 10,
+                           newY + onePx * 10 - 1,
                            color);
 
     ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
                            newY + onePx * 9,
                            (newX + onePx * (maxWidth - 3)) + onePx,
-                           newY + onePx * 10,
+                           newY + onePx * 10 - 1,
                            color);
     return;
   }
-  if (color != Black) {
-    drawMonster3Animation(x, y, Black, 'C');
-  }
+
   ER5517.DrawSquare_Fill(newX + onePx * 3,
                          newY + onePx * 7,
                          (newX + onePx * 3) + onePx,
-                         newY + onePx * 8,
+                         newY + onePx * 8 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
                          newY + onePx * 7,
                          (newX + onePx * (maxWidth - 4)) + onePx,
-                         newY + onePx * 8,
+                         newY + onePx * 8 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * 4,
                          newY + onePx * 8,
                          (newX + onePx * 4) + onePx * 2,
-                         newY + onePx * 9,
+                         newY + onePx * 9 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * 2,
                          newY + onePx * 8,
                          (newX + onePx * 2) + onePx,
-                         newY + onePx * 9,
+                         newY + onePx * 9 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 3),
                          newY + onePx * 8,
                          (newX + onePx * (maxWidth - 3)) + onePx,
-                         newY + onePx * 9,
+                         newY + onePx * 9 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * 3,
                          newY + onePx * 9,
                          (newX + onePx * 3) + onePx,
-                         newY + onePx * 10,
+                         newY + onePx * 10 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 4),
                          newY + onePx * 9,
                          (newX + onePx * (maxWidth - 4)) + onePx,
-                         newY + onePx * 10,
+                         newY + onePx * 10 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx,
                          newY + onePx * 9,
                          (newX + onePx) + onePx,
-                         newY + onePx * 10,
+                         newY + onePx * 10 - 1,
                          color);
 
   ER5517.DrawSquare_Fill(newX + onePx * (maxWidth - 2),
                          newY + onePx * 9,
                          (newX + onePx * (maxWidth - 2)) + onePx,
-                         newY + onePx * 10,
+                         newY + onePx * 10 - 1,
                          color);
 
 }
