@@ -4,6 +4,8 @@ int buttonPinRed = A2;
 int buttonPinGreen = A4;
 int buttonPinYellow = A3;
 bool isGameOver = false;
+unsigned long originalSpeed = 800UL;
+
 
 #include "ScreenDriver.h"
 #include "Display.h" 
@@ -55,6 +57,9 @@ Stats gamesStats = {0, 3};
 Bullet spaceShipBullet = {0, 0, true}; 
 const int maxBullets = 7 > columns ? columns : 7;
 Bullet allBullets[maxBullets];
+bool gameIsStarted = false;
+int wavesToWin = 0;
+int wavesCleared = 0;
 
 void setup() {  
   pinMode(buttonPinBlack, INPUT_PULLUP);
@@ -89,6 +94,7 @@ void setup() {
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   createMonsters();
   createBulletsForMonsters();
+  drawWhiteLine();
  // drawGrid();
   //Serial.println(startPositionX);
 }
@@ -102,9 +108,48 @@ void loop() {
     } 
     return;
   } 
+  if (!gameIsStarted) {
+    drawChooseDiffuculty(Green);
+
+    if (digitalRead(buttonPinGreen) == LOW){
+      wavesToWin = 1;
+      gameIsStarted = true;
+      drawChooseDiffuculty(Black);
+      drawWhiteLine();
+    }
+
+    if (digitalRead(buttonPinYellow) == LOW){
+      wavesToWin = 2;
+      gameIsStarted = true; 
+      drawChooseDiffuculty(Black);
+      drawWhiteLine();
+    }
+
+    if (digitalRead(buttonPinRed) == LOW){
+      wavesToWin = 3;
+      gameIsStarted = true;
+      drawChooseDiffuculty(Black);
+      drawWhiteLine();
+    }
+    return;
+  }
 
   if(columnsDestroyed == columns) {
-    int bonusTime = rows * columns * 20 
+    wavesCleared += 1;
+    columnsDestroyed = 0;
+    drawWaveWarning(wavesCleared+1, wavesToWin, Green);
+    drawFigure(0,
+        0,
+        gridXLimit, 
+        gridYLimit, 
+        Blue
+        );
+    createBulletsForMonsters();
+    createMonsters();
+  }
+
+  if(wavesToWin == wavesCleared) {
+    int bonusTime = rows * columns * 20 * wavesToWin 
       < millis() / 1000 - secPassed
       ? 0
       :  rows * columns * 20 - (millis() / 1000 - secPassed); 
@@ -123,6 +168,7 @@ void loop() {
     return;
   }
 
+
   // drawGrid();
   moveShipBullets();
   moveMonsters();
@@ -132,17 +178,25 @@ void loop() {
   monstersShoot();
   drawShip(White); 
 
-  if (digitalRead(buttonPinBlack) == LOW){
+  if (digitalRead(buttonPinBlack) == LOW) {
     moveShip('L');
   }
 
-  if (digitalRead(buttonPinBlue) == LOW){
+  if (digitalRead(buttonPinBlue) == LOW) {
     moveShip('R');
   }
 
-  if (digitalRead(buttonPinRed) == LOW){
+  if (digitalRead(buttonPinRed) == LOW) {
     shootFromShip();
   }
+}
+
+void drawWhiteLine() {
+  ER5517.DrawSquare_Fill(gridXLimit * multiplier + 1,
+      0,
+      gridXLimit * multiplier + 1,
+      gridYLimit * multiplier - 1,
+      White);
 }
 
 void drawMonster(int r, int c, int colour) {
@@ -357,13 +411,14 @@ void createMonsters() {
   int typesOfMonsters = 3;
   int currentMonsterType = 0;
   int amountOfRowsWithTheSameType = rows / typesOfMonsters;
+  Serial.println(amountOfRowsWithTheSameType);
 
   for (int c = 0; c < columns; c++) {
     monstersColumns[c] = rows;
   }
 
   for (int r = 0; r < rows; r++) {
-    if(r % amountOfRowsWithTheSameType == 0 &&
+    if(rows >=3 && r % amountOfRowsWithTheSameType == 0 &&
         currentMonsterType < typesOfMonsters
       ) {
       currentMonsterType++;
@@ -613,6 +668,11 @@ void lowerMonsters() {
 
 void restartGame() {
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
+  ER5517.DrawSquare_Fill(gridXLimit * multiplier + 1,
+      0,
+      gridXLimit * multiplier + 1,
+      gridYLimit * multiplier - 1,
+      White);
   previousMillisForMoving = 0UL;
   previousMillisForInvulnerability = 0UL;
   previousMillisForSpeedingUp = 0UL;
@@ -632,6 +692,7 @@ void restartGame() {
   spaceShip.xCoord = spaceShipX;
   isGameOver = false;
   monstersMovingDirection = 'R';
+  wavesCleared = 0;
 
   createBulletsForMonsters();
   createMonsters();

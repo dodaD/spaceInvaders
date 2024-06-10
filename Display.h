@@ -26,7 +26,7 @@ int adjustCoordY(float oldYCoord) {
 }
 
 void drawFigure(int x, int y, int width, int height, int colour) {
-  if (x >= gridXLimit
+  if (x > gridXLimit
     || y > gridYLimit
     || x <  0 - width
     || y < height
@@ -117,6 +117,54 @@ drawStats(int score, int lifes) {
     ); //Draw mini-ships to represent lives left
   }
   previousAmountOfLives = lifes;
+}
+
+void drawWaveWarning(int currentWave, int wavesInTotal, int color) {
+  ER5517.Font_Select_16x32_32x32();
+  ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
+                      (gridYLimit * multiplier) / 2 - 66);//Half of the text width
+  ER5517.Foreground_color_65k(color);
+  ER5517.Show_String("NEW WAVE"); 
+
+  ER5517.Font_Select_12x24_24x24();
+
+
+  char newWavesNum[8];
+  String tempScore = String(currentWave);
+  tempScore.toCharArray(newWavesNum, 8); 
+  char* pointerWavesNum = newWavesNum;
+
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 15) * multiplier, 
+                      (gridYLimit / 2) * multiplier);
+  ER5517.Show_String("Wave "); 
+  ER5517.Show_String(pointerWavesNum); 
+  ER5517.Show_String(" out of "); 
+
+  tempScore = String(wavesInTotal);
+  tempScore.toCharArray(newWavesNum, 8); 
+  pointerWavesNum = newWavesNum;
+  ER5517.Show_String(pointerWavesNum); 
+}
+
+void drawChooseDiffuculty(int color) {
+  ER5517.Font_Select_16x32_32x32();
+  ER5517.Goto_Text_XY((gridXLimit * multiplier) / 2 - 72, 
+                      (gridYLimit * multiplier) / 2 - 66);//Half of the text width
+  ER5517.Foreground_color_65k(color);
+  ER5517.Show_String("Choose difficulty level"); 
+
+  ER5517.Font_Select_12x24_24x24();
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 30) * multiplier, 
+                      (gridYLimit / 2) * multiplier);
+  ER5517.Show_String("Difficulty - 1, 1 wave of monster, press green button"); 
+
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 30) * multiplier, 
+                      (gridYLimit / 2 + 5) * multiplier);
+  ER5517.Show_String("Difficulty - 2, 2 wave of monster, press yellow button");
+
+  ER5517.Goto_Text_XY((gridXLimit / 2 - 30) * multiplier, 
+                      (gridYLimit / 2 + 10) * multiplier);
+  ER5517.Show_String("Difficulty - 3, 3 wave of monster, press red button"); 
 }
 
 void drawGameOverText() {

@@ -29,7 +29,7 @@
 
 #define LCD_PCLK_Falling_Rising     1      // 1:FallingEdge    0:RisingEdge
 #define LCD_HSYNC_Active_Polarity   0      // 1:HighLevel    0:LowLevel
-#define LCD_VSYNC_Active_Polarity   0      // 1:HighLevel    0:LowLevel
+#define LCD_VSYNC_Active_Polarity  0      // 1:HighLevel    0:LowLevel
 #define LCD_DE_Active_Polarity      1      // 1:HighLevel    0:LowLevel
 
 #define cSetb0    0x01
@@ -53,7 +53,7 @@
 #define White   0xffff
 #define Red     0xf800
 #define Green   0x07e0
-#define Blue    0x001f
+#define Blue    0x001f 
 #define Yellow  Red|Green
 #define Cyan    Green|Blue
 #define Purple  Red|Blue
