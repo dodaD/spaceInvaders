@@ -1,8 +1,9 @@
-int buttonPinBlack = A0;
+int buttonPinBlack = A8;
 int buttonPinBlue = A1;
-int buttonPinRed = A2;
-int buttonPinGreen = A4;
-int buttonPinYellow = A3;
+int buttonPinRed = A4;
+int buttonPinGreen = A15;
+int buttonPinYellow = A12;
+//int buttonPinCat = A3;
 bool isGameOver = false;
 unsigned long originalSpeed = 800UL;
 
@@ -96,7 +97,8 @@ void setup() {
   createBulletsForMonsters();
   drawWhiteLine();
  // drawGrid();
-  //Serial.println(startPositionX);
+  //Serial.println(secPassed);
+  Serial.println(secPassed);
 }
 
 void loop() {
@@ -136,29 +138,28 @@ void loop() {
 
   if(columnsDestroyed == columns) {
     wavesCleared += 1;
+    if(wavesToWin == wavesCleared) {
+      int bonusTime = rows * columns * 20 * wavesToWin 
+        < millis() / 1000 - secPassed
+        ? 0
+        :  rows * columns * 20 - (millis() / 1000 - secPassed); 
+      drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
+      drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
+          0);
+      isGameOver = true;
+      return;
+    }
     columnsDestroyed = 0;
+    ER5517.DrawSquare_Fill(0, 
+        0, 
+        gridXLimit * multiplier - 1, 
+        gridYLimit * multiplier - 1, 
+        Black);
     drawWaveWarning(wavesCleared+1, wavesToWin, Green);
-    drawFigure(0,
-        0,
-        gridXLimit, 
-        gridYLimit, 
-        Blue
-        );
+    delay(1000);
+    drawWaveWarning(wavesCleared+1, wavesToWin, Black);
     createBulletsForMonsters();
     createMonsters();
-  }
-
-  if(wavesToWin == wavesCleared) {
-    int bonusTime = rows * columns * 20 * wavesToWin 
-      < millis() / 1000 - secPassed
-      ? 0
-      :  rows * columns * 20 - (millis() / 1000 - secPassed); 
-    int bonusPointsForSpeed = bonusTime / 10 * 2;
-    drawWinningText(bonusPointsForSpeed, gamesStats.lifes * 10);
-    drawStats((gamesStats.score + gamesStats.lifes * 10 + bonusPointsForSpeed), 
-        0);
-    isGameOver = true;
-    return;
   }
 
   drawStats(gamesStats.score, gamesStats.lifes);
@@ -186,7 +187,7 @@ void loop() {
     moveShip('R');
   }
 
-  if (digitalRead(buttonPinRed) == LOW) {
+  if (digitalRead(buttonPinGreen) == LOW) {
     shootFromShip();
   }
 }
@@ -411,7 +412,6 @@ void createMonsters() {
   int typesOfMonsters = 3;
   int currentMonsterType = 0;
   int amountOfRowsWithTheSameType = rows / typesOfMonsters;
-  Serial.println(amountOfRowsWithTheSameType);
 
   for (int c = 0; c < columns; c++) {
     monstersColumns[c] = rows;
@@ -666,7 +666,8 @@ void lowerMonsters() {
   }
 }
 
-void restartGame() {
+void restartGame() { 
+  Serial.println(secPassed);
   ER5517.DrawSquare_Fill(0,0,LCD_XSIZE_TFT,LCD_YSIZE_TFT,Black);
   ER5517.DrawSquare_Fill(gridXLimit * multiplier + 1,
       0,
